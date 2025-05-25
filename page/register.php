@@ -1,7 +1,4 @@
 <?php
-
-$page_title = "Register";
-
 if (!isset($flashMessageService)) {
      error_log("Critical: FlashMessageService not available in register.php");
 }
@@ -94,6 +91,14 @@ if (empty($csrf_token)) {
                         <input type="password" name="password_confirm" id="password_confirm" class="form-control" placeholder="Confirm your password" required>
                     </div>
                 </div>
+
+                <?php if (!empty($validation_errors)): ?>
+                    <div class="form-errors">
+                        <?php foreach ($validation_errors as $error_message_string): ?> 
+                            <p><?php echo htmlspecialchars($error_message_string); ?></p>
+                        <?php endforeach; ?>
+                    </div>
+                <?php endif; ?>
                 
                 <div class="form-actions">
                     <button type="submit" class="button button-primary button-block">Create Account</button>

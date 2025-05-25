@@ -13,7 +13,6 @@ if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== User::ROLE_ADMI
 
 use App\Lib\SettingsManager;
 
-$page_title = "Site Settings";
 
 if (!isset($settingsManager) || !$settingsManager instanceof SettingsManager) {
     if (!isset($database_handler) || !$database_handler instanceof \App\Lib\Database) {

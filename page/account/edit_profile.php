@@ -3,7 +3,6 @@ if (!isset($_SESSION['user_id'])) {
     header("Location: /index.php?page=home&login_required=true");
     exit;
 }
-use App\Lib\Database;
 use App\Controllers\ProfileController;
 
 $userId = (int)$_SESSION['user_id'];

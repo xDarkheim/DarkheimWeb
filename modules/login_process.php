@@ -8,8 +8,8 @@ use App\Lib\FlashMessageService;
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $database_handler = new Database();
-    $auth = new Auth($database_handler);
     $flashMessageService = new FlashMessageService();
+    $auth = new Auth($database_handler, $flashMessageService);
 
     $identifier = $_POST['username_or_email'] ?? '';
     $password = $_POST['password'] ?? '';
@@ -34,13 +34,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         header('Location: /index.php?page=account_dashboard');
         exit;
     } else {
-        $_SESSION['login_errors']['credentials'] = ['text' => 'Invalid username/email or password.'];
-        if (isset($loginResult['errors']) && is_array($loginResult['errors'])) {
-            $_SESSION['login_errors']['details'] = $loginResult['errors'];
+        // Улучшенная обработка ошибок
+        if (isset($loginResult['errors']) && !empty($loginResult['errors'])) {
+            foreach ($loginResult['errors'] as $error) {
+                if (strpos($error, '<a href=') !== false) {
+                    $flashMessageService->addError($error, true); 
+                } else {
+                    $flashMessageService->addError($error); 
+                }
+            }
+        } else {
+            $flashMessageService->addError('Login failed. Please check your credentials.');
         }
+        
         $_SESSION['form_data_login_username'] = $identifier;
-
-        $flashMessageService->addError('Invalid username/email or password.');
 
         header('Location: /index.php?page=login');
         exit();

@@ -12,8 +12,6 @@ if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== User::ROLE_ADMI
     header('Location: /index.php?page=home');
     exit();
 }
-
-$page_title = "Edit User";
 $user_to_edit = null;
 $user_id = null;
 $errors = [];

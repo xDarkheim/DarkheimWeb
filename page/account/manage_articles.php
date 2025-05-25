@@ -3,8 +3,6 @@
 use App\Models\Article;
 use App\Models\User; 
 
-$page_title = "Manage Articles";
-
 if (!isset($_SESSION['user_id'])) {
     if(isset($flashMessageService)) $flashMessageService->addError('You must be logged in to manage articles.');
     $redirect_url = urlencode('/index.php?page=manage_articles');

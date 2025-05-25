@@ -13,7 +13,6 @@ $allCategories = [];
 $selectedArticleViewCategories = [];
 $selectedCategorySlug = filter_input(INPUT_GET, 'category', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
 $articleId = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
-$pageTitle = "News Feed";
 $errorMessage = null;
 
 if (!isset($db) || !$db instanceof PDO) {

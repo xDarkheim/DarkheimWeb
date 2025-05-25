@@ -1,7 +1,4 @@
 <?php
-$page_title = "Login";
-
-
 if (!isset($flashMessageService)) {
     error_log("Critical: FlashMessageService not available in login.php");
 }

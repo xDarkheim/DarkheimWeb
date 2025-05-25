@@ -5,8 +5,6 @@ use App\Models\Article;
 use App\Models\Category;
 use App\Lib\FlashMessageService;
 
-$pageTitle = "Edit Article";
-
 $article_id = null;
 $title_form = '';
 $content_form = '';

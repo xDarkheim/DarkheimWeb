@@ -76,9 +76,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-
-
-$page_title = "Manage Users";
 $users = [];
 $errors = []; 
 

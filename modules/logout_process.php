@@ -2,27 +2,21 @@
 
 require_once dirname(__DIR__) . '/includes/bootstrap.php';
 
+// Используем пространства имен для доступа к классам
+use App\Lib\Database;
+use App\Lib\FlashMessageService;
+use App\Lib\Auth;
 
-$_SESSION = array();
-
-if (ini_get("session.use_cookies")) {
-    $params = session_get_cookie_params();
-    setcookie(session_name(), '', time() - 42000,
-        $params["path"], $params["domain"],
-        $params["secure"], $params["httponly"]
-    );
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
 }
 
-session_destroy();
+$database_handler = new Database();
+$flashMessageService = new FlashMessageService();
+$auth = new Auth($database_handler, $flashMessageService);
 
 
-session_start();
-session_regenerate_id(true);
-
-
-$_SESSION['flash_messages'][] = ['type' => 'success', 'text' => 'You have successfully logged out.'];
-
-
+$auth->logout();
 
 $redirect_url = '/index.php?page=home';
 header("Location: " . $redirect_url);

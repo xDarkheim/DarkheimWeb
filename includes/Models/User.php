@@ -3,6 +3,7 @@ namespace App\Models;
 
 use App\Lib\Database;
 use PDO;
+use PDOException;
 
 class User {
     public const ROLE_ADMIN = 'admin';
@@ -10,24 +11,51 @@ class User {
     public const ROLE_USER = 'user';
 
     private ?int $id = null;
-    private string $username;
+    private ?string $username = null;
     private ?string $email = null;
     private ?string $password_hash = null;
-    private ?string $role = 'user';
-    private ?string $created_at = null;
+    private ?string $email_verification_token_hash = null;
+    private ?string $email_verification_expires_at = null;
+    private ?string $email_verified_at = null;
+    private int $is_active = 0;
+
+    private ?string $role = self::ROLE_USER;
+    private ?string $reset_token_hash = null;
+    private ?string $reset_token_expires_at = null;
     private ?string $location = null;
     private ?string $user_status = null;
     private ?string $bio = null;
     private ?string $website_url = null;
+    private ?string $created_at = null;
     private ?string $updated_at = null;
-
-    private ?string $reset_token_hash = null;
-    private ?string $reset_token_expires_at = null;
+    private bool $is_password_changed = false;
 
     private Database $db_handler;
 
     public function __construct(Database $db_handler) {
         $this->db_handler = $db_handler;
+    }
+
+    protected function loadUserData(array $data): void {
+        $this->id = (int)$data['id'];
+        $this->username = $data['username'];
+        $this->email = $data['email'];
+        $this->password_hash = $data['password_hash'];
+        
+        $this->email_verification_token_hash = $data['email_verification_token_hash'] ?? null;
+        $this->email_verification_expires_at = $data['email_verification_expires_at'] ?? null;
+        $this->email_verified_at = $data['email_verified_at'] ?? null;
+        $this->is_active = isset($data['is_active']) ? (int)$data['is_active'] : 0;
+
+        $this->role = $data['role'] ?? self::ROLE_USER;
+        $this->reset_token_hash = $data['reset_token_hash'] ?? null;
+        $this->reset_token_expires_at = $data['reset_token_expires_at'] ?? null;
+        $this->location = $data['location'] ?? null;
+        $this->user_status = $data['user_status'] ?? null;
+        $this->bio = $data['bio'] ?? null;
+        $this->website_url = $data['website_url'] ?? null;
+        $this->created_at = $data['created_at'];
+        $this->updated_at = $data['updated_at'] ?? null;
     }
 
     public function getId(): ?int {
@@ -73,7 +101,6 @@ class User {
     public function getUpdatedAt(): ?string {
         return $this->updated_at;
     }
-    // Геттеры для новых свойств
     public function getResetTokenHash(): ?string
     {
         return $this->reset_token_hash;
@@ -84,6 +111,12 @@ class User {
         return $this->reset_token_expires_at;
     }
 
+    public function getEmailVerificationTokenHash(): ?string { return $this->email_verification_token_hash; }
+    public function getEmailVerificationExpiresAt(): ?string { return $this->email_verification_expires_at; }
+    public function getEmailVerifiedAt(): ?string { return $this->email_verified_at; }
+    public function isActive(): bool { return (bool)$this->is_active; }
+
+
     public function setUsername(string $username): void {
         $this->username = trim($username);
     }
@@ -93,7 +126,14 @@ class User {
     }
 
     public function setPassword(string $plainPassword): void {
+        if (empty($plainPassword)) {
+            error_log("User model (setPassword): Attempted to set an empty password for user ID: " . ($this->id ?? 'Unknown'));
+            return;
+        }
+        error_log("User model (setPassword): Plain password received for user ID " . ($this->id ?? 'Unknown') . ": " . substr($plainPassword, 0, 3) . "..."); 
         $this->password_hash = password_hash($plainPassword, PASSWORD_DEFAULT);
+        error_log("User model (setPassword): New hash generated for user ID " . ($this->id ?? 'Unknown') . ": " . substr($this->password_hash, 0, 10) . "...");
+        $this->is_password_changed = true; 
     }
 
     public function setRole(string $role): void {
@@ -120,58 +160,161 @@ class User {
         $this->website_url = $url;
     }
 
+    public function setEmailVerificationToken(string $token): void {
+        $this->email_verification_token_hash = hash('sha256', $token);
+        $this->email_verification_expires_at = date('Y-m-d H:i:s', time() + (24 * 60 * 60));
+        $this->is_active = 0; 
+        $this->email_verified_at = null; 
+    }
+    
     public function save(): bool {
         $conn = $this->db_handler->getConnection();
         if (!$conn) return false;
 
-        if ($this->id) {
-            $sql = "UPDATE users SET username = ?, email = ?, password_hash = ?, role = ?, location = ?, user_status = ?, bio = ?, website_url = ? WHERE id = ?";
+        if ($this->id === null) {
+            $this->created_at = date('Y-m-d H:i:s');
+            if ($this->role === null) $this->role = self::ROLE_USER;
+
+            $sql = "INSERT INTO users (username, email, password_hash, role, created_at, 
+                                    email_verification_token_hash, email_verification_expires_at, is_active,
+                                    location, user_status, bio, website_url) 
+                    VALUES (:username, :email, :password_hash, :role, :created_at, 
+                            :email_verification_token_hash, :email_verification_expires_at, :is_active,
+                            :location, :user_status, :bio, :website_url)";
             $stmt = $conn->prepare($sql);
-            if ($stmt === false) {
-                error_log("User model (save update): Failed to prepare statement: " . implode(":", $conn->errorInfo()));
-                return false;
-            }
-            $result = $stmt->execute([
-                $this->username,
-                $this->email,
-                $this->password_hash,
-                $this->role,
-                $this->location,
-                $this->user_status,
-                $this->bio,
-                $this->website_url,
-                $this->id
-            ]);
-            if (!$result) {
-                error_log("User model (save update): Failed to execute statement: " . implode(":", $stmt->errorInfo()));
-            }
-            return $result;
-        } else {
-            $sql = "INSERT INTO users (username, email, password_hash, role, created_at, location, user_status, bio, website_url) VALUES (?, ?, ?, ?, NOW(), ?, ?, ?, ?)";
+            $params = [
+                ':username' => $this->username,
+                ':email' => $this->email,
+                ':password_hash' => $this->password_hash,
+                ':role' => $this->role,
+                ':created_at' => $this->created_at,
+                ':email_verification_token_hash' => $this->email_verification_token_hash,
+                ':email_verification_expires_at' => $this->email_verification_expires_at,
+                ':is_active' => $this->is_active,
+                ':location' => $this->location,
+                ':user_status' => $this->user_status,
+                ':bio' => $this->bio,
+                ':website_url' => $this->website_url,
+            ];
+        } else { 
+            error_log("User::save() called for existing user ID {$this->id}. Use specific update methods instead.");
+            $sql = "UPDATE users SET username = :username, email = :email, role = :role, 
+                                   location = :location, user_status = :user_status, bio = :bio, website_url = :website_url,
+                                   updated_at = NOW()
+                    WHERE id = :id";
             $stmt = $conn->prepare($sql);
-            if ($stmt === false) {
-                error_log("User model (save insert): Failed to prepare statement: " . implode(":", $conn->errorInfo()));
-                return false;
+            $params = [
+                ':username' => $this->username,
+                ':email' => $this->email,
+                ':role' => $this->role,
+                ':location' => $this->location,
+                ':user_status' => $this->user_status,
+                ':bio' => $this->bio,
+                ':website_url' => $this->website_url,
+                ':id' => $this->id, 
+            ];
+
+            if (!empty($this->password_hash) && $this->is_password_changed) {
+                error_log("User model (save/update): is_password_changed is true. Current SQL does NOT update password. Hash: " . substr($this->password_hash, 0, 10) . "... for user ID: " . $this->id);
             }
-            $result = $stmt->execute([
-                $this->username,
-                $this->email,
-                $this->password_hash,
-                $this->role,
-                $this->location,
-                $this->user_status,
-                $this->bio,
-                $this->website_url
-            ]);
-            if ($result) {
+            error_log("User model (save/update): Executing SQL for general details: " . $sql);
+        }
+
+        if ($stmt === false) {
+            error_log("User model save: Failed to prepare statement. Error: " . implode(":", $conn->errorInfo()));
+            return false;
+        }
+        $result = $stmt->execute($params);
+        if ($result) {
+            if ($this->id === null) {
                 $this->id = (int)$conn->lastInsertId();
-            } else {
-                error_log("User model (save insert): Failed to execute statement: " . implode(":", $stmt->errorInfo()));
+                $this->is_password_changed = false; 
             }
-            return $result;
+            return true;
+        } else { 
+            error_log("User model save: Failed to execute statement. Error: " . implode(":", $stmt->errorInfo()));
+            return false;
         }
     }
 
+    public function markEmailAsVerified(): bool {
+        if ($this->id === null) return false;
+
+        $this->email_verified_at = date('Y-m-d H:i:s');
+        $this->is_active = 1;
+
+        $conn = $this->db_handler->getConnection();
+        if (!$conn) {
+            error_log("User model (markEmailAsVerified): No database connection.");
+            return false;
+        }
+
+        $sql = "UPDATE users SET
+                    email_verified_at = :email_verified_at,
+                    is_active = :is_active,
+                    email_verification_token_hash = NULL,
+                    email_verification_expires_at = NULL,
+                    updated_at = NOW()
+                WHERE id = :id";
+        $stmt = $conn->prepare($sql);
+
+        if ($stmt === false) {
+            error_log("User model (markEmailAsVerified): Failed to prepare statement. Error: " . implode(":", $conn->errorInfo()));
+            return false;
+        }
+
+        $executeResult = $stmt->execute([
+            ':email_verified_at' => $this->email_verified_at,
+            ':is_active' => $this->is_active,
+            ':id' => $this->id
+        ]);
+
+        if (!$executeResult) {
+            error_log("User model (markEmailAsVerified): Failed to execute statement. Error: " . implode(":", $stmt->errorInfo()) . " For User ID: " . $this->id);
+            return false;
+        }
+        
+        return true;
+    }
+
+    public static function findByEmailVerificationToken(Database $db_handler, string $token): ?User {
+        $token_hash = hash('sha256', $token); 
+        $conn = $db_handler->getConnection();
+        if (!$conn) {
+            error_log("User model (findByEmailVerificationToken): No database connection."); 
+            return null;
+        }
+
+        $sql = "SELECT * FROM users WHERE email_verification_token_hash = ? AND email_verification_expires_at > NOW()";
+        $stmt = $conn->prepare($sql);
+        if ($stmt === false) {
+            error_log("User model (findByEmailVerificationToken): Failed to prepare statement. Error: " . implode(":", $conn->errorInfo()));
+            return null;
+        }
+        $stmt->execute([$token_hash]);
+        $userData = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if ($userData) {
+            $user = new self($db_handler);
+            $user->loadUserData($userData);
+            return $user;
+        } else {
+            error_log("User model (findByEmailVerificationToken): No user found for token_hash: " . $token_hash . ". Original token: " . $token);
+            $checkExpiredSql = "SELECT email_verification_expires_at FROM users WHERE email_verification_token_hash = ? LIMIT 1"; 
+            $checkStmt = $conn->prepare($checkExpiredSql);
+            if ($checkStmt) {
+                $checkStmt->execute([$token_hash]);
+                $result = $checkStmt->fetch(PDO::FETCH_ASSOC);
+                if ($result) { 
+                    error_log("User model (findByEmailVerificationToken): Token hash " . $token_hash . " exists, but may have expired. Expiration was at " . $result['email_verification_expires_at']);
+                } else {
+                    error_log("User model (findByEmailVerificationToken): Token hash " . $token_hash . " does not exist in DB.");
+                }
+            }
+            return null;
+        }
+    }
+    
     public static function findByUsernameOrEmail(Database $db_handler, string $username = '', string $email = ''): ?array {
         $conn = $db_handler->getConnection();
         if (!$conn) return null;
@@ -187,15 +330,22 @@ class User {
 
     public static function findByIdentifier(Database $db_handler, string $identifier): ?self {
         $conn = $db_handler->getConnection();
-        if (!$conn) return null;
+        if (!$conn) {
+            error_log("User::findByIdentifier - Database connection failed.");
+            return null;
+        }
 
-        $stmt = $conn->prepare(
-            "SELECT id, username, email, password_hash, role, created_at, updated_at, location, user_status, bio, website_url, reset_token_hash, reset_token_expires_at 
-             FROM users 
-             WHERE username = :username_identifier OR email = :email_identifier"
-        );
+        $sql = "SELECT id, username, email, password_hash, role, created_at, updated_at, 
+                       location, user_status, bio, website_url, 
+                       reset_token_hash, reset_token_expires_at,
+                       email_verification_token_hash, email_verification_expires_at, email_verified_at, is_active
+                FROM users 
+                WHERE username = :username_identifier OR email = :email_identifier";
+        
+        $stmt = $conn->prepare($sql);
+
         if ($stmt === false) {
-            error_log("User::findByIdentifier - Failed to prepare statement.");
+            error_log("User::findByIdentifier - Failed to prepare statement. Error: " . implode(":", $conn->errorInfo()));
             return null;
         }
 
@@ -213,21 +363,10 @@ class User {
 
         if ($userData) {
             $user = new self($db_handler);
-            $user->id = (int)$userData['id'];
-            $user->username = $userData['username'];
-            $user->email = $userData['email'];
-            $user->password_hash = $userData['password_hash'];
-            $user->role = $userData['role'];
-            $user->created_at = $userData['created_at'];
-            $user->updated_at = $userData['updated_at'] ?? null;
-            $user->location = $userData['location'] ?? null;
-            $user->user_status = $userData['user_status'] ?? null;
-            $user->bio = $userData['bio'] ?? null;
-            $user->website_url = $userData['website_url'] ?? null;
-            $user->reset_token_hash = $userData['reset_token_hash'] ?? null;
-            $user->reset_token_expires_at = $userData['reset_token_expires_at'] ?? null;
+            $user->loadUserData($userData); 
             return $user;
         }
+        error_log("User::findByIdentifier - No user found for identifier: " . $identifier);
         return null;
     }
 
@@ -282,10 +421,11 @@ class User {
         if ($stmt === false) {
             error_log("User model: Failed to prepare statement for updating password: " . implode(":", $conn->errorInfo()));
             return false;
-        }
+        } 
         $result = $stmt->execute([$newPasswordHash, $this->id]);
         if ($result) {
             $this->password_hash = $newPasswordHash;
+            $this->is_password_changed = false; 
         } else {
             error_log("User model: Failed to execute statement for updating password: " . implode(":", $stmt->errorInfo()));
         }
@@ -395,7 +535,7 @@ class User {
         return null;
     }
 
-    public function setPasswordResetToken(string $token, int $validityDurationSeconds = 3600): bool
+    public function setPasswordResetToken(?string $token, int $validityDurationSeconds = 3600): bool
     {
         if (!$this->id) {
             error_log("User::setPasswordResetToken - User ID not set.");
@@ -408,15 +548,32 @@ class User {
             return false;
         }
 
-        $this->reset_token_hash = password_hash($token, PASSWORD_DEFAULT);
-        $this->reset_token_expires_at = date('Y-m-d H:i:s', time() + $validityDurationSeconds);
+        $tokenHashToSave = null;
+        $expiresAtToSave = null;
+
+        if ($token !== null) {
+            $tokenHashToSave = password_hash($token, PASSWORD_DEFAULT);
+            $expiresAtToSave = date('Y-m-d H:i:s', time() + $validityDurationSeconds);
+            error_log("User::setPasswordResetToken - Setting new reset token for user ID {$this->id}. Expires at: " . $expiresAtToSave);
+        } else {
+            error_log("User::setPasswordResetToken - Clearing reset token for user ID {$this->id}.");
+        }
+        
+        $this->reset_token_hash = $tokenHashToSave;
+        $this->reset_token_expires_at = $expiresAtToSave;
 
         try {
-            $stmt = $conn->prepare("UPDATE users SET reset_token_hash = :token_hash, reset_token_expires_at = :expires_at WHERE id = :id");
-            $stmt->bindParam(':token_hash', $this->reset_token_hash, PDO::PARAM_STR);
-            $stmt->bindParam(':expires_at', $this->reset_token_expires_at, PDO::PARAM_STR);
+            $stmt = $conn->prepare("UPDATE users SET reset_token_hash = :token_hash, reset_token_expires_at = :expires_at, updated_at = NOW() WHERE id = :id");
+            $stmt->bindParam(':token_hash', $tokenHashToSave, $tokenHashToSave === null ? PDO::PARAM_NULL : PDO::PARAM_STR);
+            $stmt->bindParam(':expires_at', $expiresAtToSave, $expiresAtToSave === null ? PDO::PARAM_NULL : PDO::PARAM_STR);
             $stmt->bindParam(':id', $this->id, PDO::PARAM_INT);
-            return $stmt->execute();
+            $executed = $stmt->execute();
+            if ($executed) {
+                error_log("User::setPasswordResetToken - DB update successful for user ID {$this->id}.");
+            } else {
+                error_log("User::setPasswordResetToken - DB update FAILED for user ID {$this->id}. Error: " . implode(":", $stmt->errorInfo()));
+            }
+            return $executed;
         } catch (\PDOException $e) {
             error_log("User::setPasswordResetToken - PDOException for user ID {$this->id}: " . $e->getMessage());
             return false;

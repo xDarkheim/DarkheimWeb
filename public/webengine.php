@@ -9,6 +9,7 @@ use App\Components\NavigationComponent;
 use App\Components\UserPanelComponent;
 use App\Components\QuickLinksComponent;
 use App\Lib\SettingsManager;
+use App\Lib\MailerService;
 
 $database_handler = new Database();
 $db = $database_handler->getConnection();
@@ -22,7 +23,9 @@ $site_settings_from_db = $settingsManager->getAllSettings();
 
 $flashMessageService = new FlashMessageService();
 
-$auth = new Auth($database_handler, $flashMessageService);
+$mailerService = new MailerService($site_settings_from_db); 
+
+$auth = new Auth($database_handler, $flashMessageService, $mailerService);
 
 $routes_config = require_once ROOT_PATH . DS . 'includes' . DS . 'config' . DS . 'routes_config.php';
 
@@ -39,39 +42,51 @@ if (isset($_SESSION['success_message_sidebar'])) {
     unset($_SESSION['success_message_sidebar']);
 }
 
-$messages_for_main_display = [];
+$messages_for_main_display_typed = [];
 $text_for_sidebar_component = null;
 
-if ($sidebar_success_text_identifier !== null) {
-    foreach ($all_messages_from_service as $msg) {
-        if ($msg['text'] === $sidebar_success_text_identifier && $msg['type'] === 'success') {
-            $text_for_sidebar_component = $msg['text'];
+if ($sidebar_success_text_identifier !== null && isset($all_messages_from_service['success'])) {
+    $success_messages_for_main = [];
+    foreach ($all_messages_from_service['success'] as $msgData) {
+        if ($msgData['text'] === $sidebar_success_text_identifier) {
+            $text_for_sidebar_component = $msgData['text'];
         } else {
-            $messages_for_main_display[] = $msg;
+            $success_messages_for_main[] = $msgData;
+        }
+    }
+    if (!empty($success_messages_for_main)) {
+        $messages_for_main_display_typed['success'] = $success_messages_for_main;
+    }
+
+    foreach ($all_messages_from_service as $type => $messagesOfType) {
+        if ($type !== 'success') {
+            $messages_for_main_display_typed[$type] = $messagesOfType;
         }
     }
 } else {
-    $messages_for_main_display = $all_messages_from_service;
+    $messages_for_main_display_typed = $all_messages_from_service;
 }
-
-$current_user_role = $_SESSION['user_role'] ?? null;
 
 $template_data = [];
 
+$template_data['page_messages'] = $messages_for_main_display_typed;
+
+$current_user_role = $_SESSION['user_role'] ?? null;
+
 $site_name_from_db = $site_settings_from_db['site_name'] ?? 'WebEngine Darkheim';
 
-$current_page_specific_title = $page_title ?? null; 
+$current_page_specific_title = $page_title ?? 'Default Title'; 
 
 if ($current_page_specific_title && $current_page_specific_title !== $site_name_from_db) {
-    $title_for_html_tag = $site_name_from_db . " " . $current_page_specific_title;
-    $main_heading_for_page = $current_page_specific_title;
+    $title_for_html_tag = htmlspecialchars($current_page_specific_title) . " | " . htmlspecialchars($site_name_from_db);
+    $main_heading_for_page = htmlspecialchars($current_page_specific_title);
 } else {
-    $title_for_html_tag = $site_name_from_db;
-    $main_heading_for_page = $site_name_from_db;
+    $title_for_html_tag = htmlspecialchars($site_name_from_db);
+    $main_heading_for_page = htmlspecialchars($site_name_from_db);
 }
 
-$template_data['page_title'] = htmlspecialchars($title_for_html_tag); 
-$template_data['page_main_heading'] = htmlspecialchars($main_heading_for_page); 
+$template_data['html_page_title'] = $title_for_html_tag; 
+$template_data['page_main_heading'] = $main_heading_for_page; 
 $template_data['site_name_logo'] = htmlspecialchars($site_name_from_db); 
 
 $template_data['site_config'] = $site_settings_from_db;
@@ -79,12 +94,10 @@ $template_data['site_config'] = $site_settings_from_db;
 $template_data['database_handler'] = $database_handler;
 $template_data['db'] = $db;
 
-$template_data['page_messages'] = $messages_for_main_display;
-
 $navigationComponent = new NavigationComponent($page_key); 
 $template_data['main_navigation_html'] = $navigationComponent->render();
 
-$auth_pages_no_sidebar = ['login', 'register', 'edit_user', 'forgot_password'];
+$auth_pages_no_sidebar = ['login', 'register', 'edit_user', 'forgot_password' , 'resend_verification', 'error_404', 'reset_password'];
 $show_sidebar = !in_array($page_key, $auth_pages_no_sidebar);
 
 if ($show_sidebar) {
@@ -110,29 +123,49 @@ extract($template_data);
 
 require_once ROOT_PATH . DS . 'themes' . DS . SITE_THEME . DS . 'header.php';
 
-if (!empty($page_messages)) {
-    echo '<div class="page-messages-container">';
-    foreach ($page_messages as $message) {
+if (!empty($all_messages_from_service)) { 
+    echo '<div class="page-messages-container">'; 
+    foreach ($all_messages_from_service as $type => $messagesOfType) {
         $typeClass = 'info'; 
-            switch (strtolower($message['type'])) { 
-                case 'success':
-                    $typeClass = 'success';
-                    break;
-                case 'error':
-                case 'errors':
-                    $typeClass = 'errors';
-                    break;
-                case 'warning':
-                    $typeClass = 'warning';
-                    break;
+        switch (strtolower($type)) { 
+            case 'success':
+                $typeClass = 'success';
+                break;
+            case 'error':
+            case 'errors':
+                $typeClass = 'errors';
+                break;
+            case 'warning':
+                $typeClass = 'warning';
+                break;
+        }
+
+        foreach ($messagesOfType as $messageData) {
+            echo '<div class="messages ' . htmlspecialchars($typeClass) . '">'; 
+
+            if (is_array($messageData) && isset($messageData['text']) && isset($messageData['is_html'])) {
+                $text = $messageData['text'];
+                $isHtml = $messageData['is_html'];
+
+                if ($isHtml) {
+                    echo '<p>' . $text . '</p>';
+                } else {
+                    echo '<p>' . htmlspecialchars($text) . '</p>';
+                }
+            } else {
+                if (is_string($messageData)) {
+                    echo '<p>' . htmlspecialchars($messageData) . '</p>';
+                    error_log("webengine.php: Encountered a string message in flash messages. Message: " . $messageData); // Логируем для отладки
+                } else {
+                    error_log("webengine.php: Encountered unexpected data type in flash messages. Data: " . print_r($messageData, true));
+                }
             }
-       
-        echo '<div class="messages ' . htmlspecialchars($typeClass) . '">';
-        echo '<p>' . htmlspecialchars($message['text']) . '</p>';
-        echo '</div>';
+            echo '</div>';
+        }
     }
     echo '</div>';
 }
+
 
 if (!empty($content_file) && file_exists($content_file)) {
     require_once $content_file;

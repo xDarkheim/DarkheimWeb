@@ -4,118 +4,29 @@
  */
 
 return [
-    'home' => [
-        'controller' => \App\Controllers\ProfileController::class,
-        'action' => 'index',
-        'file' => 'home.php',
-        'title' => 'Home',
-        'auth_required' => false,
-        'guest_only' => false,
-    ],
-    'news' => [
-        'file' => 'news.php',
-        'title' => 'News',
-        'auth_required' => false,
-        'guest_only' => false,
-    ],
-    'login' => [
-        'file' => 'login.php',
-        'title' => 'Login',
-        'auth_required' => false,
-        'guest_only' => false,
-    ],
-    'forgot_password' => [
-        'file' => 'forgot_password.php',
-        'title' => 'Forgot Password',
-        'auth_required' => false,
-        'guest_only' => false,
-    ],
-    'about' => [
-        'file' => 'about.php',
-        'title' => 'About',
-        'auth_required' => false,
-        'guest_only' => false,
-    ],
-    'contact' => [
-        'file' => 'contact.php',
-        'title' => 'Contact',
-        'auth_required' => false,
-        'guest_only' => false,
-    ],
-    'forum' => [
-        'file' => 'forum.php',
-        'title' => 'Forum',
-        'auth_required' => false,
-        'guest_only' => false,
-    ],
-    'register' => [
-        'file' => 'register.php',
-        'title' => 'Registration',
-        'auth_required' => false,
-        'guest_only' => true, // For guests only
-    ],
-    'account_dashboard' => [ // New key
-        'file' => 'account/dashboard.php', // New path
-        'title' => 'My Dashboard',
-        'auth_required' => true,
-        'guest_only' => false,
-    ],
-    'manage_articles' => [
-        'file' => 'account/manage_articles.php', // Updated path
-        'title' => 'Manage Articles',
-        'auth_required' => true,
-        'guest_only' => false,
-    ],
-    'create_article' => [
-        'file' => 'account/create_article.php', // Updated path
-        'title' => 'Create Article',
-        'auth_required' => true,
-        'guest_only' => false,
-    ],
-    'delete_article' => [
-        'file' => 'account/delete_article.php', // Updated path
-        'title' => 'Delete Article',
-        'auth_required' => true,
-        'guest_only' => false,
-    ],
-    'edit_article' => [
-        'file' => 'account/edit_article.php', // Updated path
-        'title' => 'Edit Article',
-        'auth_required' => true,
-        'guest_only' => false,
-    ],
-    'account_edit_profile' => [ // New key
-        'file' => 'account/edit_profile.php', // New path
-        'title' => 'Edit Profile',
-        'auth_required' => true,
-        'guest_only' => false,
-    ],
-    'account_settings' => [ // Key remains, path changes
-        'file' => 'account/settings.php', // New path and filename
-        'title' => 'Account Settings',
-        'auth_required' => true,
-        'guest_only' => false,
-    ],
-    'site_settings' => [ // Key remains, path changes
-        'file' => 'site_settings.php', // New path and filename
-        'title' => 'Site Settings',
-        'auth_required' => true,
-        'guest_only' => false,
-    ],
-    'manage_users' => [ // Key remains, path changes
-        'file' => 'account/manage_users.php', // New path and filename
-        'title' => 'Manage Users',
-        'auth_required' => true,
-        'guest_only' => false,
-    ],
-    'edit_user' => [ // Key remains, path changes
-        'file' => 'account/edit_user.php', // New path and filename
-        'title' => 'Edit User',
-        'auth_required' => true,
-        'guest_only' => false,
-    ],
-    'profile/edit' => [
-        'controller' => App\Controllers\ProfileController::class,
-        'action' => 'editProfilePage',
-    ],
+    'home' => ['file' => 'home.php', 'title' => 'Homepage'],
+    'news' => ['file' => 'news.php', 'title' => 'News'],
+    'about' => ['file' => 'about.php', 'title' => 'About Us'],
+    'contact' => ['file' => 'contact.php', 'title' => 'Contact'],
+    'login' => ['file' => 'login.php', 'title' => 'Login'],
+    'register' => ['file' => 'register.php', 'title' => 'Register'],
+    'forgot_password' => ['file' => 'forgot_password.php', 'title' => 'Forgot Password'],
+    'verify_email' => ['file' => 'verify_email.php', 'title' => 'Verify Email'],
+    'resend_verification' => ['file' => 'resend_verification.php', 'title' => 'Resend Verification'],
+    'reset_password' => ['file' => 'reset_password.php', 'title' => 'Reset Password'],
+
+    // Account routes
+    'account_dashboard' => ['file' => 'account/dashboard.php', 'title' => 'My Dashboard', 'auth' => true],
+    'manage_articles' => ['file' => 'account/manage_articles.php', 'title' => 'Manage Articles', 'auth' => true],
+    'create_article' => ['file' => 'account/create_article.php', 'title' => 'Create Article', 'auth' => true],
+    'delete_article' => ['file' => 'account/delete_article.php', 'title' => 'Delete Article', 'auth' => true],
+    'edit_article' => ['file' => 'account/edit_article.php', 'title' => 'Edit Article', 'auth' => true],
+    'account_edit_profile' => ['file' => 'account/edit_profile.php', 'title' => 'Edit Profile', 'auth' => true],
+    'account_settings' => ['file' => 'account/settings.php', 'title' => 'Account Settings', 'auth' => true],
+    'site_settings' => ['file' => 'site_settings.php', 'title' => 'Site Settings', 'auth' => true, 'admin' => true],
+    'manage_users' => ['file' => 'account/manage_users.php', 'title' => 'Manage Users', 'auth' => true, 'admin' => true],
+    'edit_user' => ['file' => 'account/edit_user.php', 'title' => 'Edit User', 'auth' => true, 'admin' => true],
+
+    // Default/fallback
+    '404' => ['file' => '404.php', 'title' => 'Page Not Found'],
 ];

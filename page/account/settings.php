@@ -23,12 +23,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (isset($_POST['change_password'])) {
         if (!isset($_POST['csrf_token_change_password']) || !hash_equals($_SESSION['csrf_token_change_password'] ?? '', $_POST['csrf_token_change_password'] ?? '')) {
             if(isset($flashMessageService)) $flashMessageService->addError('Security error: Invalid CSRF token for password change.');
-            // $_SESSION['csrf_token_change_password'] = bin2hex(random_bytes(32)); // Не обновлять при ошибке, если хотим дать попытку еще раз с той же формой
         } else {
-            $profileController->handleChangePasswordRequest($_POST);
-            $_SESSION['csrf_token_change_password'] = bin2hex(random_bytes(32)); // Обновить токен после успешной проверки/обработки
+            $success = $profileController->handleChangePasswordRequest($_POST);
+            $_SESSION['csrf_token_change_password'] = bin2hex(random_bytes(32));
+            if ($success) {
+                header('Location: /index.php?page=account_settings'); 
+                exit;
+            }
         }
-        header('Location: /index.php?page=account_settings'); // Редирект в любом случае
+        header('Location: /index.php?page=account_settings');
         exit;
     } elseif (isset($_POST['update_email'])) {
         if (!isset($_POST['csrf_token_update_email']) || !hash_equals($_SESSION['csrf_token_update_email'] ?? '', $_POST['csrf_token_update_email'] ?? '')) {
@@ -38,7 +41,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $profileController->handleUpdateDetailsRequest($emailData);
             $_SESSION['csrf_token_update_email'] = bin2hex(random_bytes(32));
         }
-        header('Location: /index.php?page=account_settings'); // Редирект в любом случае
+        header('Location: /index.php?page=account_settings');
         exit;
     }
 }
@@ -54,6 +57,13 @@ if (!$userData) {
 
 <div class="form-page-container account-settings-container">
     <h1>Account Settings</h1>
+
+    <?php 
+    if (!empty($page_message['text'])): ?>
+        <div class="messages message-<?php echo htmlspecialchars($page_message['type']); ?>">
+            <p><?php echo htmlspecialchars($page_message['text']); ?></p>
+        </div>
+    <?php endif; ?>
 
     <div class="settings-section">
         <h2>Change Password</h2>

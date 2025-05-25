@@ -8,8 +8,8 @@ use App\Lib\FlashMessageService;
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $database_handler = new Database();
-    $auth = new Auth($database_handler);
     $flashMessageService = new FlashMessageService();
+    $auth = new Auth($database_handler, $flashMessageService);
 
     $username = $_POST['username'] ?? '';
     $email = $_POST['email'] ?? '';

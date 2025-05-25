@@ -4,8 +4,6 @@ use App\Models\Article;
 use App\Models\Category;
 use App\Lib\FlashMessageService;
 
-$page_title = "Create New Article";
-
 if (!isset($database_handler) || !$database_handler instanceof \App\Lib\Database) {
     if(isset($flashMessageService)) $flashMessageService->addError("Database handler error.");
     echo "<p class='message message--error'>Database handler error.</p>";
