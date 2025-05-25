@@ -72,19 +72,28 @@ class Auth {
             $siteName = defined('SITE_NAME') ? \SITE_NAME : (defined('MAIL_FROM_NAME') ? \MAIL_FROM_NAME : 'Our Website');
             $verificationLink = rtrim(SITE_URL, '/') . "/index.php?page=verify_email&token=" . urlencode($verificationToken);
             
-            $emailHtmlBody = $this->mailerService->renderTemplate('registration_verification', [
+            // Переименуем переменную для ясности
+            $email_content_array = $this->mailerService->renderTemplate('registration_verification', [
                 'username' => $username,
                 'verificationLink' => $verificationLink,
                 'siteName' => $siteName
             ]);
             $emailSubject = "Verify Your Email Address - " . $siteName;
 
-            if ($this->mailerService->send($email, $username, $emailSubject, $emailHtmlBody)) {
-                return ['success' => true, 'message' => "Registration successful! Please check your email (" . htmlspecialchars($email) . ") to verify your account and activate it."];
+            // Проверяем, что получили массив и нужные ключи
+            if ($email_content_array && isset($email_content_array['html']) && isset($email_content_array['text'])) {
+                // Передаем HTML и текст как отдельные аргументы
+                if ($this->mailerService->send($email, $username, $emailSubject, $email_content_array['html'], $email_content_array['text'])) {
+                    return ['success' => true, 'message' => "Registration successful! Please check your email (" . htmlspecialchars($email) . ") to verify your account and activate it."];
+                } else {
+                    error_log("Auth::register - User {$username} registered, but verification email failed to send to {$email}. MailerService error: " . ($this->mailerService->ErrorInfo ?? 'Unknown error'));
+                    $this->flashService->addWarning("Registration was successful, but we couldn't send the verification email. Please contact support if you don't receive it shortly.");
+                    return ['success' => true, 'message' => "Registration successful! We tried to send a verification email to " . htmlspecialchars($email) . ". If you don't receive it, please contact support."];
+                }
             } else {
-                error_log("Auth::register - User {$username} registered, but verification email failed to send to {$email}.");
-                $this->flashService->addWarning("Registration was successful, but we couldn't send the verification email. Please contact support if you don't receive it shortly.");
-                return ['success' => true, 'message' => "Registration successful! We tried to send a verification email to " . htmlspecialchars($email) . ". If you don't receive it, please contact support."];
+                error_log("Auth::register - User {$username} registered, but failed to render email template 'registration_verification'.");
+                $this->flashService->addWarning("Registration was successful, but there was an issue preparing the verification email. Please contact support.");
+                return ['success' => true, 'message' => "Registration successful! There was an issue preparing the verification email. Please contact support."];
             }
         } else {
             $errors[] = "Failed to save user. Please try again.";
@@ -148,18 +157,33 @@ class Auth {
             $siteName = defined('SITE_NAME') ? \SITE_NAME : (defined('MAIL_FROM_NAME') ? \MAIL_FROM_NAME : 'Our Website');
             $verificationLink = rtrim(SITE_URL, '/') . "/index.php?page=verify_email&token=" . urlencode($verificationToken);
             
-            $emailHtmlBody = $this->mailerService->renderTemplate('registration_verification', [
+            // Получаем массив с HTML и текстовой версией
+            $email_content_array = $this->mailerService->renderTemplate('registration_verification', [
                 'username' => $user->getUsername() ?? 'User',
                 'verificationLink' => $verificationLink,
                 'siteName' => $siteName
             ]);
             $emailSubject = "Verify Your Email Address - " . $siteName;
 
-            if ($this->mailerService->send($user->getEmail() ?? '', $user->getUsername() ?? 'User', $emailSubject, $emailHtmlBody)) {
-                return ['success' => true, 'message' => "A new verification email has been sent to " . htmlspecialchars($user->getEmail() ?? '') . ". Please check your inbox."];
+            // Проверяем, что рендеринг прошел успешно и у нас есть обе части письма
+            if ($email_content_array && isset($email_content_array['html']) && isset($email_content_array['text'])) {
+                // Передаем HTML и текст как отдельные аргументы
+                if ($this->mailerService->send(
+                    $user->getEmail() ?? '', 
+                    $user->getUsername() ?? 'User', 
+                    $emailSubject, 
+                    $email_content_array['html'],  // HTML часть
+                    $email_content_array['text']   // Текстовая часть
+                )) {
+                    return ['success' => true, 'message' => "A new verification email has been sent to " . htmlspecialchars($user->getEmail() ?? '') . ". Please check your inbox."];
+                } else {
+                    error_log("Auth::resendVerificationEmail - Failed to send new verification email to {$user->getEmail()}. MailerService error: " . ($this->mailerService->ErrorInfo ?? 'Unknown error'));
+                    return ['success' => false, 'message' => "Could not send verification email. Please try again later or contact support."];
+                }
             } else {
-                error_log("Auth::resendVerificationEmail - Failed to send new verification email to {$user->getEmail()}.");
-                return ['success' => false, 'message' => "Could not send verification email. Please try again later or contact support."];
+                // Ошибка рендеринга шаблона
+                error_log("Auth::resendVerificationEmail - Failed to render email template 'registration_verification' for user {$user->getEmail()}.");
+                return ['success' => false, 'message' => "Could not prepare the verification email. Please contact support."];
             }
         } else {
             error_log("Auth::resendVerificationEmail - Failed to update verification token for user {$user->getEmail()}. DB error: " . ($stmt ? implode(":", $stmt->errorInfo()) : $conn->errorInfo()[2]));

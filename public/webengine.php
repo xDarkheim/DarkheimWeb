@@ -35,41 +35,51 @@ $page_key = isset($_GET['page']) ? trim(strtolower($_GET['page'])) : 'home';
 
 $router->dispatch($page_key);
 
-$all_messages_from_service = $flashMessageService->getMessages();
-$sidebar_success_text_identifier = $_SESSION['success_message_sidebar'] ?? null;
+$all_messages = $flashMessageService->getMessages(); // Получаем все сообщения ОДИН РАЗ и очищаем из сессии
 
-if (isset($_SESSION['success_message_sidebar'])) {
-    unset($_SESSION['success_message_sidebar']);
+$page_messages_for_display = []; // Сообщения для основного отображения
+$sidebar_success_text = null;    // Текст для сообщения в боковой панели
+
+$sidebar_success_identifier = $_SESSION['success_message_sidebar'] ?? null;
+if ($sidebar_success_identifier) {
+    unset($_SESSION['success_message_sidebar']); // Очищаем идентификатор из сессии
 }
 
-$messages_for_main_display_typed = [];
-$text_for_sidebar_component = null;
-
-if ($sidebar_success_text_identifier !== null && isset($all_messages_from_service['success'])) {
-    $success_messages_for_main = [];
-    foreach ($all_messages_from_service['success'] as $msgData) {
-        if ($msgData['text'] === $sidebar_success_text_identifier) {
-            $text_for_sidebar_component = $msgData['text'];
-        } else {
-            $success_messages_for_main[] = $msgData;
+// Обрабатываем сообщения типа 'success' для возможного разделения
+if (isset($all_messages['success']) && is_array($all_messages['success'])) {
+    $main_success_messages = [];
+    if ($sidebar_success_identifier) {
+        foreach ($all_messages['success'] as $msgData) {
+            if (isset($msgData['text']) && $msgData['text'] === $sidebar_success_identifier) {
+                $sidebar_success_text = $msgData['text']; // Или $msgData, если нужен флаг is_html
+            } else {
+                $main_success_messages[] = $msgData;
+            }
         }
+    } else {
+        $main_success_messages = $all_messages['success'];
     }
-    if (!empty($success_messages_for_main)) {
-        $messages_for_main_display_typed['success'] = $success_messages_for_main;
+    if (!empty($main_success_messages)) {
+        $page_messages_for_display['success'] = $main_success_messages;
     }
-
-    foreach ($all_messages_from_service as $type => $messagesOfType) {
-        if ($type !== 'success') {
-            $messages_for_main_display_typed[$type] = $messagesOfType;
-        }
-    }
-} else {
-    $messages_for_main_display_typed = $all_messages_from_service;
+    unset($all_messages['success']);
 }
 
-$template_data = [];
 
-$template_data['page_messages'] = $messages_for_main_display_typed;
+foreach ($all_messages as $type => $messagesOfType) {
+    if (!empty($messagesOfType)) {
+        $page_messages_for_display[$type] = $messagesOfType;
+    }
+}
+
+global $template_data; 
+if (!isset($template_data) || !is_array($template_data)) {
+    $template_data = []; 
+}
+$template_data['page_messages'] = $page_messages_for_display;
+if ($sidebar_success_text) {
+    $template_data['sidebar_success_message_text'] = $sidebar_success_text; // Для использования в компоненте боковой панели
+}
 
 $current_user_role = $_SESSION['user_role'] ?? null;
 
@@ -104,7 +114,7 @@ if ($show_sidebar) {
     $userPanelComponent = new UserPanelComponent(
         $current_user_role,
         [],
-        $text_for_sidebar_component
+        $sidebar_success_text ?? null
     );
     $sidebar_user_panel_html = $userPanelComponent->render();
     $template_data['sidebar_user_panel_html'] = $sidebar_user_panel_html;
@@ -123,44 +133,45 @@ extract($template_data);
 
 require_once ROOT_PATH . DS . 'themes' . DS . SITE_THEME . DS . 'header.php';
 
-if (!empty($all_messages_from_service)) { 
-    echo '<div class="page-messages-container">'; 
-    foreach ($all_messages_from_service as $type => $messagesOfType) {
-        $typeClass = 'info'; 
-        switch (strtolower($type)) { 
-            case 'success':
-                $typeClass = 'success';
-                break;
-            case 'error':
-            case 'errors':
-                $typeClass = 'errors';
-                break;
-            case 'warning':
-                $typeClass = 'warning';
-                break;
-        }
+// Отображение flash-сообщений для основного контента ПЕРЕД основным контентом страницы
+if (!empty($page_messages) && is_array($page_messages)) { // Используем $page_messages из extract($template_data)
+    // Убираем встроенный style отсюда, он будет в CSS
+    echo '<div class="flash-messages-container global-flash-messages">'; 
+    foreach ($page_messages as $type => $messagesOfType) {
+        if (is_array($messagesOfType)) {
+            foreach ($messagesOfType as $messageData) {
+                if (is_array($messageData) && isset($messageData['text'])) {
+                    $text = $messageData['is_html'] ?? false ? $messageData['text'] : htmlspecialchars($messageData['text']);
+                    
+                    // Используем классы из вашей темы
+                    $baseMessageClass = 'message'; // Базовый класс из вашего style.css
+                    $typeMessageClass = '';
+                    switch (htmlspecialchars($type)) {
+                        case 'success':
+                            $typeMessageClass = 'message--success';
+                            break;
+                        case 'error': // Убедитесь, что FlashMessageService использует 'error'
+                            $typeMessageClass = 'message--error';
+                            break;
+                        case 'warning':
+                            $typeMessageClass = 'message--warning';
+                            break;
+                        case 'info':
+                            $typeMessageClass = 'message--info';
+                            break;
+                        default:
+                            // Можно задать класс по умолчанию или оставить пустым,
+                            // если базового .message достаточно
+                            $typeMessageClass = 'message--info'; 
+                    }
+                    $alertClass = trim("$baseMessageClass $typeMessageClass");
 
-        foreach ($messagesOfType as $messageData) {
-            echo '<div class="messages ' . htmlspecialchars($typeClass) . '">'; 
-
-            if (is_array($messageData) && isset($messageData['text']) && isset($messageData['is_html'])) {
-                $text = $messageData['text'];
-                $isHtml = $messageData['is_html'];
-
-                if ($isHtml) {
-                    echo '<p>' . $text . '</p>';
-                } else {
-                    echo '<p>' . htmlspecialchars($text) . '</p>';
-                }
-            } else {
-                if (is_string($messageData)) {
-                    echo '<p>' . htmlspecialchars($messageData) . '</p>';
-                    error_log("webengine.php: Encountered a string message in flash messages. Message: " . $messageData); // Логируем для отладки
-                } else {
-                    error_log("webengine.php: Encountered unexpected data type in flash messages. Data: " . print_r($messageData, true));
+                    echo "<div class=\"{$alertClass}\" role=\"alert\">";
+                    // <p> уже имеет margin-bottom: 0; из вашего класса .message p:last-child
+                    echo "<p>{$text}</p>"; 
+                    echo "</div>";
                 }
             }
-            echo '</div>';
         }
     }
     echo '</div>';
@@ -171,6 +182,21 @@ if (!empty($content_file) && file_exists($content_file)) {
     require_once $content_file;
 } else {
     error_log("Error: Content file not found or invalid for page key '{$page_key}'. Expected at: {$content_file}");
+    // Убедимся, что $page_title установлен для страницы 404
+    $page_title = "Page Not Found"; 
+    // Пересчитаем заголовок для HTML, если он изменился
+    if ($page_title && $page_title !== ($site_settings_from_db['site_name'] ?? 'WebEngine Darkheim')) {
+        $template_data['html_page_title'] = htmlspecialchars($page_title) . " | " . htmlspecialchars($site_settings_from_db['site_name'] ?? 'WebEngine Darkheim');
+        $template_data['page_main_heading'] = htmlspecialchars($page_title);
+    } else {
+        $template_data['html_page_title'] = htmlspecialchars($site_settings_from_db['site_name'] ?? 'WebEngine Darkheim');
+        $template_data['page_main_heading'] = htmlspecialchars($site_settings_from_db['site_name'] ?? 'WebEngine Darkheim');
+    }
+    // Обновим переменные после extract, если они используются напрямую в header.php до этого момента
+    // Это может быть не нужно, если header.php использует только $template_data
+    $html_page_title = $template_data['html_page_title'];
+    $page_main_heading = $template_data['page_main_heading'];
+
     require_once ROOT_PATH . DS . 'page' . DS . '404.php';
 }
 

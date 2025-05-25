@@ -6,28 +6,42 @@ use PHPMailer\PHPMailer\Exception as PHPMailerException;
 
 class MailerService {
     private PHPMailer $mailer;
+    private string $templatePath = '';
 
     public function __construct() {
         $this->mailer = new PHPMailer(true);
 
-        if (!defined('MAIL_ENABLED') || MAIL_ENABLED === false) {
-            return;
+        if (defined('MAIL_TEMPLATE_PATH')) {
+            $this->templatePath = \MAIL_TEMPLATE_PATH;
+        } else {
+            error_log("MailerService: MAIL_TEMPLATE_PATH is not defined.");
+
         }
 
-        if (!defined('MAIL_ENABLED') || MAIL_ENABLED === false) {
+        if (!defined('MAIL_ENABLED') || \MAIL_ENABLED === false) {
             return;
         }
 
         try {
             $this->mailer->isSMTP();
-            $this->mailer->Host       = MAIL_HOST;
+            $this->mailer->Host       = \MAIL_HOST;
             $this->mailer->SMTPAuth   = true;
-            $this->mailer->Username   = MAIL_USERNAME;
-            $this->mailer->Password   = MAIL_PASSWORD;
-            $this->mailer->SMTPSecure = MAIL_ENCRYPTION === 'ssl' ? PHPMailer::ENCRYPTION_SMTPS : PHPMailer::ENCRYPTION_STARTTLS;
-            $this->mailer->Port       = MAIL_PORT;
+            $this->mailer->Username   = \MAIL_USERNAME;
+            $this->mailer->Password   = \MAIL_PASSWORD;
 
-            $this->mailer->setFrom(MAIL_FROM_ADDRESS, MAIL_FROM_NAME);
+            $encryption = '';
+            if (defined('MAIL_ENCRYPTION')) {
+                $encryption = strtolower(\MAIL_ENCRYPTION);
+            }
+
+            if ($encryption === 'ssl') {
+                $this->mailer->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
+            } elseif ($encryption === 'tls') {
+                $this->mailer->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+            }
+            $this->mailer->Port       = \MAIL_PORT;
+
+            $this->mailer->setFrom(\MAIL_FROM_ADDRESS, \MAIL_FROM_NAME);
 
         } catch (PHPMailerException $e) {
             error_log("MailerService PHPMailerException during construction: {$this->mailer->ErrorInfo}");
@@ -56,23 +70,40 @@ class MailerService {
             $this->mailer->send();
             return true;
         } catch (PHPMailerException $e) {
-            error_log("Message could not be sent. Mailer Error: {$this->mailer->ErrorInfo}");
+            error_log("MailerService PHPMailerException during send: {$this->mailer->ErrorInfo}");
             return false;
         } finally {
             $this->mailer->clearAddresses();
-            $this->mailer->clearAttachments(); 
+            $this->mailer->clearAttachments();
         }
     }
 
-    public function renderTemplate(string $templateName, array $data = []): string {
-        $templatePath = ROOT_PATH . DS . 'includes' . DS . 'view' . DS . 'emails' . DS . $templateName . '.php';
-        if (file_exists($templatePath)) {
-            extract($data);
-            ob_start();
-            include $templatePath;
-            return ob_get_clean();
+
+    public function renderTemplate(string $templateName, array $data): ?array
+    {
+        if (empty($this->templatePath)) {
+            error_log("MailerService: templatePath is not set.");
+            return null;
         }
-        error_log("Email template not found: " . $templatePath);
-        return "";
+
+        $templateFile = rtrim($this->templatePath, '/') . '/' . $templateName . '.php';
+
+        if (!file_exists($templateFile)) {
+            error_log("MailerService: Email template file not found: " . $templateFile);
+            return null;
+        }
+
+        extract($data);
+
+        ob_start();
+        $email_content = include $templateFile;
+        ob_end_clean();
+
+        if (is_array($email_content) && isset($email_content['text']) && isset($email_content['html'])) {
+            return $email_content;
+        } else {
+            error_log("MailerService: Template '$templateFile' did not return the expected array structure with 'text' and 'html' keys. Returned: " . print_r($email_content, true));
+            return null;
+        }
     }
 }

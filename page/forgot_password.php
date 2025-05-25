@@ -74,14 +74,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         ];
                         
                         $email_bodies = null;
-                        if (method_exists($mailerService, 'renderTemplate')) {
-                             $htmlBody = $mailerService->renderTemplate('password_reset_request_html', $template_data);
-                             $textBody = $mailerService->renderTemplate('password_reset_request_text', $template_data);
-                             if ($htmlBody && $textBody) { 
-                                $email_bodies = ['html' => $htmlBody, 'text' => $textBody];
-                             }
-                        } else {
+
+                        if (isset($mailerService) && method_exists($mailerService, 'renderTemplate')) {
+                            $rendered_content = $mailerService->renderTemplate('password_reset_request', $template_data);
                             
+                            if (is_array($rendered_content) && isset($rendered_content['html']) && isset($rendered_content['text'])) {
+                                $email_bodies = $rendered_content;
+                            } else {
+                                error_log("Forgot Password: MailerService::renderTemplate did not return expected array for 'password_reset_request'.");
+                            }
+                        } else {
+                            error_log("Forgot Password: MailerService::renderTemplate method not found or MailerService not available. Falling back to local render.");
                             $renderEmailTemplate = function(string $templatePath, array $data): ?array {
                                 if (!file_exists($templatePath)) {
                                     error_log("Email template not found: " . $templatePath);
@@ -93,14 +96,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 ob_end_clean();
                                 return is_array($email_content) ? $email_content : null;
                             };
-                            $email_template_path = ROOT_PATH . DS . 'includes' . DS . 'view' . DS . 'emails' . DS . 'password_reset_request.php';
+                            // Убедитесь, что ROOT_PATH и DS определены корректно
+                            $email_template_path = (defined('ROOT_PATH') ? ROOT_PATH : dirname(__DIR__, 2)) . DIRECTORY_SEPARATOR . 'includes' . DIRECTORY_SEPARATOR . 'view' . DIRECTORY_SEPARATOR . 'emails' . DIRECTORY_SEPARATOR . 'password_reset_request.php';
                             $email_bodies = $renderEmailTemplate($email_template_path, $template_data);
                         }
 
-
+                        // Теперь $email_bodies должен содержать ['html' => ..., 'text' => ...] или быть null
                         if ($email_bodies && isset($email_bodies['text']) && isset($email_bodies['html'])) {
                             $recipientName = $user->getUsername() ?: $user->getEmail();
-                            if ($mailerService->send(
+                            if ($mailerService->send( // Убедитесь, что $mailerService здесь доступен и настроен
                                 $user->getEmail(),
                                 $recipientName,
                                 $subject,
