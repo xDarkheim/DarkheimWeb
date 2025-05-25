@@ -60,6 +60,11 @@ class User {
         $this->website_url = $data['website_url'] ?? null;
         $this->created_at = $data['created_at'];
         $this->updated_at = $data['updated_at'] ?? null;
+
+        // Добавьте эти строки:
+        $this->pending_email_address = $data['pending_email_address'] ?? null;
+        $this->pending_email_token_hash = $data['pending_email_token_hash'] ?? null;
+        $this->pending_email_token_expires_at = $data['pending_email_token_expires_at'] ?? null;
     }
 
     public function getId(): ?int {

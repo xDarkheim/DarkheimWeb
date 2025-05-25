@@ -26,7 +26,7 @@ return [
     'site_settings' => ['file' => 'site_settings.php', 'title' => 'Site Settings', 'auth' => true, 'admin' => true],
     'manage_users' => ['file' => 'account/manage_users.php', 'title' => 'Manage Users', 'auth' => true, 'admin' => true],
     'edit_user' => ['file' => 'account/edit_user.php', 'title' => 'Edit User', 'auth' => true, 'admin' => true],
-    'verify_email_change' => ['file' => 'account/verify_email_change.php', 'title' => 'Verify Email Change', 'auth' => true, 'admin' => true],
+    'verify_email_change' => ['file' => 'verify_email_change.php', 'title' => 'Verify Email Change', 'auth' => true, 'admin' => true],
 
     // Default/fallback
     '404' => ['file' => '404.php', 'title' => 'Page Not Found'],
