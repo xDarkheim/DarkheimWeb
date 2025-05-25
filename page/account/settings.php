@@ -3,89 +3,75 @@ if (!isset($_SESSION['user_id'])) {
     header("Location: /index.php?page=home&login_required=true");
     exit;
 }
-use App\Controllers\ProfileController;
+
+use App\Controllers\ProfileController; // For possible future use of $userData
+use App\Lib\FlashMessageService;    // For displaying messages
 
 $userId = (int)$_SESSION['user_id'];
 
-$profileController = new ProfileController($database_handler, $userId, $flashMessageService); 
+// $flashMessageService should be available globally or via $template_data
+// If it's not initialized globally, it needs to be created:
+// if (!isset($flashMessageService) || !$flashMessageService instanceof FlashMessageService) {
+//     $flashMessageService = new FlashMessageService();
+// }
 
-$page_message = ['text' => '', 'type' => ''];
-$userData = $profileController->getCurrentUserData();
+// $profileController = new ProfileController($database_handler, $userId, $flashMessageService);
+// $userData = $profileController->getCurrentUserData(); // Can be uncommented if $userData is needed
 
-if (!isset($_SESSION['csrf_token_change_password'])) {
-    $_SESSION['csrf_token_change_password'] = bin2hex(random_bytes(32));
-}
-if (!isset($_SESSION['csrf_token_update_email'])) {
-    $_SESSION['csrf_token_update_email'] = bin2hex(random_bytes(32));
-}
+$page_title = "Account & Site Settings";
 
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    if (isset($_POST['change_password'])) {
-        if (!isset($_POST['csrf_token_change_password']) || !hash_equals($_SESSION['csrf_token_change_password'] ?? '', $_POST['csrf_token_change_password'] ?? '')) {
-            if(isset($flashMessageService)) $flashMessageService->addError('Security error: Invalid CSRF token for password change.');
-        } else {
-            $currentPassword = $_POST['current_password'] ?? '';
-            $newPassword = $_POST['new_password'] ?? '';
-            $confirmPassword = $_POST['confirm_password'] ?? '';
-            $success = $profileController->handleChangePasswordRequest($currentPassword, $newPassword, $confirmPassword);
-            $_SESSION['csrf_token_change_password'] = bin2hex(random_bytes(32));
-            if ($success) {
-                header('Location: /index.php?page=account_settings'); 
-                exit;
-            }
-        }
-        header('Location: /index.php?page=account_settings');
-        exit;
-    } elseif (isset($_POST['update_email'])) {
-        if (!isset($_POST['csrf_token_update_email']) || !hash_equals($_SESSION['csrf_token_update_email'] ?? '', $_POST['csrf_token_update_email'] ?? '')) {
-            if(isset($flashMessageService)) $flashMessageService->addError('Security error: Invalid CSRF token for email update.');
-        } else {
-            $emailData = ['email' => $_POST['email'] ?? ''];
-            $profileController->handleUpdateDetailsRequest($emailData);
-            $_SESSION['csrf_token_update_email'] = bin2hex(random_bytes(32));
-        }
-        header('Location: /index.php?page=account_settings');
-        exit;
-    }
+// Generate CSRF token for future forms on this page
+if (!isset($_SESSION['csrf_token_account_settings'])) {
+    $_SESSION['csrf_token_account_settings'] = bin2hex(random_bytes(32));
 }
 
-if (!$userData) {
-    $userData = ['username' => 'N/A', 'email' => 'N/A'];
-    if (empty($page_message['text'])) {
-      $page_message = ['text' => 'Failed to load user data.', 'type' => 'error'];
-    }
-    error_log("Account Settings Page: Could not load user data for user ID: " . $userId);
-}
+// POST request handling will be added here as functionality is implemented
+// if ($_SERVER["REQUEST_METHOD"] == "POST") {
+//     // ...
+// }
+
 ?>
 
 <div class="form-page-container account-settings-container">
-    <h1>Account Settings</h1>
+    <h1><?php echo htmlspecialchars($page_title); ?></h1>
 
-    <?php 
-    if (!empty($page_message['text'])): ?>
-        <div class="messages message-<?php echo htmlspecialchars($page_message['type']); ?>">
-            <p><?php echo htmlspecialchars($page_message['text']); ?></p>
-        </div>
-    <?php endif; ?>
+    <?php
+    // Display flash messages if any (e.g., after a redirect)
+    // Ensure $flashMessageService is initialized and available
+    if (isset($flashMessageService) && $flashMessageService->hasMessages()) {
+        // Container for messages, styled via .form-page-container .messages
+        foreach ($flashMessageService->getMessages() as $type => $messagesOfType) {
+            foreach ($messagesOfType as $messageData) {
+                $text = $messageData['is_html'] ?? false ? $messageData['text'] : htmlspecialchars($messageData['text']);
+                $message_class = 'messages '; // Base class
+                switch (htmlspecialchars($type)) {
+                    case 'success': $message_class .= 'success'; break;
+                    case 'error': $message_class .= 'errors'; break; // CSS expects .errors
+                    case 'warning': $message_class .= 'warning'; break;
+                    case 'info': $message_class .= 'info'; break;
+                    default: $message_class .= 'info';
+                }
+                echo "<div class=\"{$message_class}\"><p>{$text}</p></div>";
+            }
+        }
+        $flashMessageService->clearMessages(); // Clear messages after display
+    }
+    ?>
 
     <div class="settings-section">
-        <h2>Change Password</h2>
-        <form action="/index.php?page=account_settings" method="post" class="settings-form">
-            <input type="hidden" name="csrf_token_change_password" value="<?php echo htmlspecialchars($_SESSION['csrf_token_change_password']); ?>">
+        <h2>Account Preferences</h2>
+        <p>This section will allow you to manage your account preferences, such as notification settings, language, and more. <em>(Functionality coming soon)</em></p>
+        <form class="settings-form placeholder-form">
             <div class="form-group">
-                <label for="current_password">Current Password:</label>
-                <input type="password" id="current_password" name="current_password" class="form-control" required>
-            </div>
-            <div class="form-group">
-                <label for="new_password">New Password:</label>
-                <input type="password" id="new_password" name="new_password" class="form-control" required minlength="8">
-            </div>
-            <div class="form-group">
-                <label for="confirm_password">Confirm New Password:</label>
-                <input type="password" id="confirm_password" name="confirm_password" class="form-control" required minlength="8">
+                <label for="placeholder_account_setting">Example Account Setting:</label>
+                <select id="placeholder_account_setting" name="placeholder_account_setting" class="form-control" disabled>
+                    <option>Option 1</option>
+                    <option>Option 2</option>
+                </select>
+                <small class="setting-description">This is a placeholder for a future account setting.</small>
             </div>
             <div class="form-actions">
-                <button type="submit" name="change_password" class="button button-primary">Change Password</button>
+                <button type="button" class="button button-primary" disabled>Save Account Preferences</button>
             </div>
         </form>
     </div>
@@ -93,17 +79,36 @@ if (!$userData) {
     <hr class="section-divider">
 
     <div class="settings-section">
-        <h2>Change Email</h2>
-        <form action="/index.php?page=account_settings" method="post" class="settings-form">
-            <input type="hidden" name="csrf_token_update_email" value="<?php echo htmlspecialchars($_SESSION['csrf_token_update_email']); ?>">
+        <h2>Site Design Customization</h2>
+        <p>Here, you will be able to customize certain aspects of the site's appearance, if applicable. <em>(Functionality coming soon)</em></p>
+        <form class="settings-form placeholder-form">
             <div class="form-group">
-                <label for="email">Email Address:</label>
-                <input type="email" id="email" name="email" class="form-control" value="<?php echo htmlspecialchars($userData['email'] ?? ''); ?>" required>
+                <label for="placeholder_design_setting">Example Design Setting (e.g., Theme):</label>
+                <select id="placeholder_design_setting" name="placeholder_design_setting" class="form-control" disabled>
+                    <option>Default Theme</option>
+                    <option>Dark Theme (Current)</option>
+                    <option>Light Theme</option>
+                </select>
+                <small class="setting-description">This is a placeholder for a future design customization option.</small>
             </div>
             <div class="form-actions">
-                <button type="submit" name="update_email" class="button button-primary">Update Email</button>
+                <button type="button" class="button button-primary" disabled>Save Design Settings</button>
             </div>
         </form>
+    </div>
+    
+    <hr class="section-divider">
+
+    <div class="settings-section">
+        <h2>Profile Management</h2>
+        <p>To manage your public profile details, change your password, or update your email address, please visit the Edit Profile page.</p>
+        <ul class="settings-links-list" style="list-style: none; padding-left: 0;">
+            <li>
+                <a href="/index.php?page=account_edit_profile" class="button button-secondary">
+                    <i class="fas fa-user-edit"></i> Go to Edit Profile
+                </a>
+            </li>
+        </ul>
     </div>
 
     <div class="page-actions">

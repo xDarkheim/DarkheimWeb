@@ -3,13 +3,10 @@ if (!isset($_SESSION['user_id'])) {
     header("Location: /index.php?page=home&login_required=true");
     exit;
 }
-use App\Controllers\ProfileController;
-// Предполагается, что $mailerService уже доступен (например, из bootstrap.php)
-// global $mailerService; 
+use App\Controllers\ProfileController; 
 
 $userId = (int)$_SESSION['user_id'];
-// Передаем $mailerService в конструктор
-$profileController = new ProfileController($database_handler, $userId, $flashMessageService, $mailerService); 
+$profileController = new ProfileController($database_handler, $userId, $flashMessageService);
 
 $page_message = ['text' => '', 'type' => ''];
 $userData = $profileController->getCurrentUserData();
@@ -17,13 +14,12 @@ $userData = $profileController->getCurrentUserData();
 if (!isset($_SESSION['csrf_token_edit_profile_info'])) {
     $_SESSION['csrf_token_edit_profile_info'] = bin2hex(random_bytes(32));
 }
-// Добавляем CSRF токен для формы смены пароля
+
 if (!isset($_SESSION['csrf_token_change_password'])) {
     $_SESSION['csrf_token_change_password'] = bin2hex(random_bytes(32));
 }
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // Обработка обновления информации профиля
     if (isset($_POST['update_profile_info'])) {
         if (!isset($_POST['csrf_token_edit_profile_info']) || !hash_equals($_SESSION['csrf_token_edit_profile_info'] ?? '', $_POST['csrf_token_edit_profile_info'] ?? '')) {
 
@@ -36,7 +32,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             header('Location: /index.php?page=account_edit_profile');
             exit;
         }
-        $_SESSION['csrf_token_edit_profile_info'] = bin2hex(random_bytes(32)); // Regenerate after use
+        $_SESSION['csrf_token_edit_profile_info'] = bin2hex(random_bytes(32));
 
         $profileInfoData = [
             'email' => $_POST['email'] ?? null,
@@ -46,16 +42,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             'website_url' => $_POST['website_url'] ?? null,
         ];
         $profileController->handleUpdateDetailsRequest($profileInfoData);
-        // Не делаем редирект сразу, если есть другие формы на странице,
-        // или делаем редирект, но тогда сообщения об успехе/ошибке должны быть во flash
-        // header('Location: /index.php?page=account_edit_profile'); 
-        // exit;
-    }
-    // Обработка смены пароля
-    elseif (isset($_POST['change_password_submit'])) {
+    } elseif (isset($_POST['change_password_submit'])) {
         if (!isset($_POST['csrf_token_change_password']) || !hash_equals($_SESSION['csrf_token_change_password'] ?? '', $_POST['csrf_token_change_password'] ?? '')) {
 
-            if (isset($flashMessageService)) { 
+            if (isset($flashMessageService)) {
                 $flashMessageService->addError('Security error: Invalid CSRF token for password change. Please refresh and try again.');
             } else {
                 $page_message['text'] = 'Security error: Invalid CSRF token for password change. Please refresh and try again.';
@@ -64,17 +54,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             header('Location: /index.php?page=account_edit_profile');
             exit;
         }
-        $_SESSION['csrf_token_change_password'] = bin2hex(random_bytes(32)); // Regenerate after use
-
+        $_SESSION['csrf_token_change_password'] = bin2hex(random_bytes(32));
         $currentPassword = $_POST['current_password'] ?? '';
         $newPassword = $_POST['new_password'] ?? '';
         $confirmPassword = $_POST['confirm_password'] ?? '';
         
         $profileController->handleChangePasswordRequest($currentPassword, $newPassword, $confirmPassword);
-        // header('Location: /index.php?page=account_edit_profile'); // Редирект для обновления flash сообщений
-        // exit;
-    }
-    // После обработки POST, чтобы flash сообщения отобразились корректно:
+    } // <<<< ДОБАВЛЕНА ЭТА ЗАКРЫВАЮЩАЯ СКОБКА
+
     if (isset($_POST['update_profile_info']) || isset($_POST['change_password_submit'])) {
         header('Location: /index.php?page=account_edit_profile');
         exit;

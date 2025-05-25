@@ -126,13 +126,13 @@ if (!$userData) {
         <li>
             <a href="/index.php?page=account_edit_profile">
                 Edit My Profile
-                <span class="action-status">(Update personal info, bio, social links, etc.)</span>
+                <span class="action-status">(Update username, email, location, bio, and website URL)</span>
             </a>
         </li>
         <li>
             <a href="/index.php?page=account_settings">
                 Account Settings
-                <span class="action-status">(Change password, email preferences)</span>
+                <span class="action-status">(Manage account preferences, security settings, and more)</span>
             </a>
         </li>
         <?php 

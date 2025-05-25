@@ -776,7 +776,7 @@ img {
     max-width: 600px;
     margin: 0 auto var(--spacing-4) auto;
     padding: var(--spacing-3);
-    background-color: rgba(var(--color-warning-rgb, 255, 193, 7), 0.1);
+    background-color: rgba(var(--color-warning, 255, 193, 7), 0.1);
     border: 1px solid var(--color-warning, #FFC107);
     border-left-width: 5px;
     border-radius: var(--border-radius-md);
@@ -786,59 +786,46 @@ img {
     display: block;
 }
 
-/* Global Flash Messages Container */
-.flash-messages-container.global-flash-messages {
-    position: fixed;
-    top: 80px;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 1050; 
-    width: 90%;
-    max-width: 550px;
-    display: flex;
-    flex-direction: column;
-    gap: var(--spacing-2);
+/* General styles for messages (flash_messages) WITHIN specific page containers like .form-page-container */
+.form-page-container .messages {
+    padding: var(--spacing-3) var(--spacing-4);
+    margin-top: 0; /* Убедимся, что нет отрицательного верхнего отступа */
+    margin-bottom: var(--spacing-4); /* Отступ снизу до следующего элемента */
+    border-radius: var(--border-radius-md);
+    border-width: 1px;
+    border-style: solid;
+    font-size: var(--font-size-md);
+    display: flex; /* Для выравнивания иконки, если она будет */
+    align-items: center;
+    width: 100%; /* Занимает всю ширину родительского контейнера */
+    box-sizing: border-box; /* Чтобы padding и border не влияли на общую ширину */
+    position: relative; /* Остается в потоке, позволяет z-index, если нужно перекрыть соседние элементы в потоке */
+                      /* Если z-index не нужен, можно использовать position: static; (по умолчанию для блоков) */
+    z-index: 1;       /* Небольшой z-index на всякий случай, если есть перекрытия с соседними элементами */
+    clear: both;      /* Если есть проблемы с float у предыдущих элементов */
+}
+.form-page-container .messages p {
+    margin: 0;
+    flex-grow: 1;
 }
 
-/*
-.message {
-    padding: var(--spacing-3);
-    margin-bottom: 0;
-    border: 1px solid transparent;
-    border-radius: var(--border-radius-lg);
-    color: var(--color-text);
-    background-color: var(--color-surface-accent);
-    box-shadow: var(--shadow-sm);
-    display: flex;
-    align-items: flex-start;
-    gap: var(--spacing-2);
+/* Стили для разных типов внутристраничных сообщений */
+.form-page-container .messages.success {
+    background-color: #2a4d34; /* Темно-зеленый фон */
+    border-color: var(--color-success); /* Ярко-зеленая рамка */
+    color: var(--color-primary-contrast); /* Светлый текст */
 }
-.message p:last-child {
-    margin-bottom: 0;
+
+.form-page-container .messages.errors {
+    background-color: #5a2a2a; /* Темно-красный фон */
+    border-color: var(--color-danger); /* Ярко-красная рамка */
+    color: var(--color-primary-contrast); /* Светлый текст */
 }
-.message--success {
-    background-color: rgba(var(--color-success-rgb), 0.15);
-    border-color: var(--color-success);
-    color: var(--color-success);
-}
-.message--error {
-    background-color: rgba(var(--color-danger-rgb), 0.15);
-    border-color: var(--color-danger);
-    color: var(--color-danger);
-}
-.message--warning {
-    background-color: rgba(var(--color-warning-rgb), 0.15);
-    border-color: var(--color-warning);
-    color: #a15c00; 
-}
-.message--info {
-    background-color: rgba(var(--color-info-rgb), 0.15);
-    border-color: var(--color-info);
-    color: var(--color-info);
-}
-*/
-.global-flash-messages .message {
-    margin-bottom: 0;
+
+.form-page-container .messages.info {
+    background-color: #2a3f5a; /* Темно-синий фон */
+    border-color: var(--color-info); /* Ярко-синяя рамка */
+    color: var(--color-primary-contrast); /* Светлый текст */
 }
 
 /* Layout: Site Footer */
@@ -2599,38 +2586,46 @@ hr.section-divider { /* For <hr> between settings sections */
     margin-bottom: var(--spacing-5);
 }
 
-/* General styles for messages (flash_messages) */
+/* General styles for messages (flash_messages) WITHIN specific page containers like .form-page-container */
 .form-page-container .messages {
     padding: var(--spacing-3) var(--spacing-4);
-    margin-bottom: var(--spacing-4);
+    margin-top: 0; /* Убедимся, что нет отрицательного верхнего отступа */
+    margin-bottom: var(--spacing-4); /* Отступ снизу до следующего элемента */
     border-radius: var(--border-radius-md);
     border-width: 1px;
     border-style: solid;
     font-size: var(--font-size-md);
-    display: flex;
+    display: flex; /* Для выравнивания иконки, если она будет */
     align-items: center;
+    width: 100%; /* Занимает всю ширину родительского контейнера */
+    box-sizing: border-box; /* Чтобы padding и border не влияли на общую ширину */
+    position: relative; /* Остается в потоке, позволяет z-index, если нужно перекрыть соседние элементы в потоке */
+                      /* Если z-index не нужен, можно использовать position: static; (по умолчанию для блоков) */
+    z-index: 1;       /* Небольшой z-index на всякий случай, если есть перекрытия с соседними элементами */
+    clear: both;      /* Если есть проблемы с float у предыдущих элементов */
 }
 .form-page-container .messages p {
     margin: 0;
     flex-grow: 1;
 }
 
+/* Стили для разных типов внутристраничных сообщений */
 .form-page-container .messages.success {
-    background-color: rgba(var(--color-success-rgb, 25, 135, 84), 0.1);
-    border-color: var(--color-success, #198754);
-    color: var(--color-success-dark, #12613c);
+    background-color: #2a4d34; /* Темно-зеленый фон */
+    border-color: var(--color-success); /* Ярко-зеленая рамка */
+    color: var(--color-primary-contrast); /* Светлый текст */
 }
 
-.form-page-container .messages.error {
-    background-color: rgba(var(--color-danger-rgb, 220, 53, 69), 0.1);
-    border-color: var(--color-danger, #dc3545);
-    color: var(--color-danger-dark, #a32835);
+.form-page-container .messages.errors {
+    background-color: #5a2a2a; /* Темно-красный фон */
+    border-color: var(--color-danger); /* Ярко-красная рамка */
+    color: var(--color-primary-contrast); /* Светлый текст */
 }
 
 .form-page-container .messages.info {
-    background-color: rgba(var(--color-info-rgb, 13, 202, 240), 0.1);
-    border-color: var(--color-info, #0dcaf0);
-    color: var(--color-info-dark, #087990);
+    background-color: #2a3f5a; /* Темно-синий фон */
+    border-color: var(--color-info); /* Ярко-синяя рамка */
+    color: var(--color-primary-contrast); /* Светлый текст */
 }
 
 

@@ -22,7 +22,6 @@
             </button>
         </div>
     </header>
-
     <div class="site-wrapper">
         <?php if ($show_sidebar): ?>
         <aside class="sidebar">

@@ -132,51 +132,31 @@ if ($show_sidebar) {
 extract($template_data);
 
 require_once ROOT_PATH . DS . 'themes' . DS . SITE_THEME . DS . 'header.php';
-
-// Display flash messages for the main content BEFORE the main page content
-if (!empty($page_messages) && is_array($page_messages)) { // Use $page_messages from extract($template_data)
-    // Remove inline style from here, it will be in CSS
-    echo '<div class="flash-messages-container global-flash-messages">';
-    foreach ($page_messages as $type => $messagesOfType) {
-        if (is_array($messagesOfType)) {
-            foreach ($messagesOfType as $messageData) {
-                if (is_array($messageData) && isset($messageData['text'])) {
-                    $text = $messageData['is_html'] ?? false ? $messageData['text'] : htmlspecialchars($messageData['text']);
-
-                    // Use classes from your theme
-                    $baseMessageClass = 'message'; // Base class from your style.css
-                    $typeMessageClass = '';
-                    switch (htmlspecialchars($type)) {
-                        case 'success':
-                            $typeMessageClass = 'message--success';
-                            break;
-                        case 'error': // Ensure FlashMessageService uses 'error'
-                            $typeMessageClass = 'message--error';
-                            break;
-                        case 'warning':
-                            $typeMessageClass = 'message--warning';
-                            break;
-                        case 'info':
-                            $typeMessageClass = 'message--info';
-                            break;
-                        default:
-                            // Can set a default class or leave empty
-                            // if the base .message is sufficient
-                            $typeMessageClass = 'message--info';
+    // Display global flash messages right after body tag
+    if (!empty($page_messages) && is_array($page_messages)) {
+        echo '<div class="flash-messages-container global-flash-messages">';
+        foreach ($page_messages as $type => $messagesOfType) {
+            if (is_array($messagesOfType)) {
+                foreach ($messagesOfType as $messageData) {
+                    if (is_array($messageData) && isset($messageData['text'])) {
+                        $text = $messageData['is_html'] ?? false ? $messageData['text'] : htmlspecialchars($messageData['text']);
+                        $baseMessageClass = 'message';
+                        $typeMessageClass = '';
+                        switch (htmlspecialchars($type)) {
+                            case 'success': $typeMessageClass = 'message--success'; break;
+                            case 'error': $typeMessageClass = 'message--error'; break;
+                            case 'warning': $typeMessageClass = 'message--warning'; break;
+                            case 'info': $typeMessageClass = 'message--info'; break;
+                            default: $typeMessageClass = 'message--info';
+                        }
+                        $alertClass = trim("$baseMessageClass $typeMessageClass");
+                        echo "<div class=\"{$alertClass}\" role=\"alert\"><p>{$text}</p></div>";
                     }
-                    $alertClass = trim("$baseMessageClass $typeMessageClass");
-
-                    echo "<div class=\"{$alertClass}\" role=\"alert\">";
-                    // <p> already has margin-bottom: 0; from your .message p:last-child class
-                    echo "<p>{$text}</p>";
-                    echo "</div>";
                 }
             }
         }
+        echo '</div>';
     }
-    echo '</div>';
-}
-
 
 if (!empty($content_file) && file_exists($content_file)) {
     require_once $content_file;
