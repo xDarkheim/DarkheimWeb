@@ -4,9 +4,12 @@ if (!isset($_SESSION['user_id'])) {
     exit;
 }
 use App\Controllers\ProfileController;
+// Предполагается, что $mailerService уже доступен (например, из bootstrap.php)
+// global $mailerService; 
 
 $userId = (int)$_SESSION['user_id'];
-$profileController = new ProfileController($database_handler, $userId, $flashMessageService);
+// Передаем $mailerService в конструктор
+$profileController = new ProfileController($database_handler, $userId, $flashMessageService, $mailerService); 
 
 $page_message = ['text' => '', 'type' => ''];
 $userData = $profileController->getCurrentUserData();
@@ -14,33 +17,67 @@ $userData = $profileController->getCurrentUserData();
 if (!isset($_SESSION['csrf_token_edit_profile_info'])) {
     $_SESSION['csrf_token_edit_profile_info'] = bin2hex(random_bytes(32));
 }
+// Добавляем CSRF токен для формы смены пароля
+if (!isset($_SESSION['csrf_token_change_password'])) {
+    $_SESSION['csrf_token_change_password'] = bin2hex(random_bytes(32));
+}
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    if (!isset($_POST['csrf_token_edit_profile_info']) || !hash_equals($_SESSION['csrf_token_edit_profile_info'] ?? '', $_POST['csrf_token_edit_profile_info'] ?? '')) {
+    // Обработка обновления информации профиля
+    if (isset($_POST['update_profile_info'])) {
+        if (!isset($_POST['csrf_token_edit_profile_info']) || !hash_equals($_SESSION['csrf_token_edit_profile_info'] ?? '', $_POST['csrf_token_edit_profile_info'] ?? '')) {
 
-        if (isset($flashMessageService)) { 
-            $flashMessageService->addError('Security error: Invalid CSRF token. Please refresh the page and try again.');
-        } else {
-            $page_message['text'] = 'Security error: Invalid CSRF token. Please refresh the page and try again.';
-            $page_message['type'] = 'error';
-        }
-        header('Location: /index.php?page=account_edit_profile');
-        exit;
-    } else {
-        $_SESSION['csrf_token_edit_profile_info'] = bin2hex(random_bytes(32));
-
-        if (isset($_POST['update_profile_info'])) {
-            $profileInfoData = [
-                'location' => $_POST['location'] ?? null,
-                'user_status' => $_POST['user_status'] ?? null,
-                'bio' => $_POST['bio'] ?? null,
-                'website_url' => $_POST['website_url'] ?? null,
-            ];
-            $profileController->handleUpdateDetailsRequest($profileInfoData);
-
+            if (isset($flashMessageService)) { 
+                $flashMessageService->addError('Security error: Invalid CSRF token for profile info. Please refresh and try again.');
+            } else {
+                $page_message['text'] = 'Security error: Invalid CSRF token for profile info. Please refresh and try again.';
+                $page_message['type'] = 'error';
+            }
             header('Location: /index.php?page=account_edit_profile');
             exit;
         }
+        $_SESSION['csrf_token_edit_profile_info'] = bin2hex(random_bytes(32)); // Regenerate after use
+
+        $profileInfoData = [
+            'email' => $_POST['email'] ?? null,
+            'location' => $_POST['location'] ?? null,
+            'user_status' => $_POST['user_status'] ?? null,
+            'bio' => $_POST['bio'] ?? null,
+            'website_url' => $_POST['website_url'] ?? null,
+        ];
+        $profileController->handleUpdateDetailsRequest($profileInfoData);
+        // Не делаем редирект сразу, если есть другие формы на странице,
+        // или делаем редирект, но тогда сообщения об успехе/ошибке должны быть во flash
+        // header('Location: /index.php?page=account_edit_profile'); 
+        // exit;
+    }
+    // Обработка смены пароля
+    elseif (isset($_POST['change_password_submit'])) {
+        if (!isset($_POST['csrf_token_change_password']) || !hash_equals($_SESSION['csrf_token_change_password'] ?? '', $_POST['csrf_token_change_password'] ?? '')) {
+
+            if (isset($flashMessageService)) { 
+                $flashMessageService->addError('Security error: Invalid CSRF token for password change. Please refresh and try again.');
+            } else {
+                $page_message['text'] = 'Security error: Invalid CSRF token for password change. Please refresh and try again.';
+                $page_message['type'] = 'error';
+            }
+            header('Location: /index.php?page=account_edit_profile');
+            exit;
+        }
+        $_SESSION['csrf_token_change_password'] = bin2hex(random_bytes(32)); // Regenerate after use
+
+        $currentPassword = $_POST['current_password'] ?? '';
+        $newPassword = $_POST['new_password'] ?? '';
+        $confirmPassword = $_POST['confirm_password'] ?? '';
+        
+        $profileController->handleChangePasswordRequest($currentPassword, $newPassword, $confirmPassword);
+        // header('Location: /index.php?page=account_edit_profile'); // Редирект для обновления flash сообщений
+        // exit;
+    }
+    // После обработки POST, чтобы flash сообщения отобразились корректно:
+    if (isset($_POST['update_profile_info']) || isset($_POST['change_password_submit'])) {
+        header('Location: /index.php?page=account_edit_profile');
+        exit;
     }
 }
 
@@ -83,10 +120,10 @@ if (!$userData) {
             <div class="setting-item">
                 <div class="setting-label">
                     <label for="email">Email:</label>
-                    <small class="setting-description">Your account email address.</small>
+                    <small class="setting-description">Your account email address. Changing it will require confirmation via the new email.</small>
                 </div>
                 <div class="setting-control">
-                    <input type="email" id="email" name="email" class="form-control" value="<?php echo htmlspecialchars($userData['email'] ?? ''); ?>" disabled>
+                    <input type="email" id="email" name="email" class="form-control" value="<?php echo htmlspecialchars($userData['email'] ?? ''); ?>" > 
                 </div>
             </div>
 
@@ -132,6 +169,47 @@ if (!$userData) {
 
             <div class="form-actions setting-actions">
                 <button type="submit" name="update_profile_info" class="button button-primary">Save Profile Information</button>
+            </div>
+        </form>
+    </div>
+
+    <div class="settings-section password-change-section">
+        <h2>Change Password</h2>
+        <form action="/index.php?page=account_edit_profile" method="post" class="settings-form">
+            <input type="hidden" name="csrf_token_change_password" value="<?php echo htmlspecialchars($_SESSION['csrf_token_change_password']); ?>">
+
+            <div class="setting-item">
+                <div class="setting-label">
+                    <label for="current_password">Current Password:</label>
+                    <small class="setting-description">Enter your current password.</small>
+                </div>
+                <div class="setting-control">
+                    <input type="password" id="current_password" name="current_password" class="form-control" required>
+                </div>
+            </div>
+
+            <div class="setting-item">
+                <div class="setting-label">
+                    <label for="new_password">New Password:</label>
+                    <small class="setting-description">Choose a strong new password (min. 8 characters).</small>
+                </div>
+                <div class="setting-control">
+                    <input type="password" id="new_password" name="new_password" class="form-control" required minlength="8">
+                </div>
+            </div>
+
+            <div class="setting-item">
+                <div class="setting-label">
+                    <label for="confirm_password">Confirm New Password:</label>
+                    <small class="setting-description">Enter your new password again.</small>
+                </div>
+                <div class="setting-control">
+                    <input type="password" id="confirm_password" name="confirm_password" class="form-control" required minlength="8">
+                </div>
+            </div>
+
+            <div class="form-actions setting-actions">
+                <button type="submit" name="change_password_submit" class="button button-danger">Change Password</button>
             </div>
         </form>
     </div>

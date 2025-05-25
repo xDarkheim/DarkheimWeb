@@ -30,6 +30,10 @@ class User {
     private ?string $updated_at = null;
     private bool $is_password_changed = false;
 
+    private ?string $pending_email_address = null;
+    private ?string $pending_email_token_hash = null;
+    private ?string $pending_email_token_expires_at = null;
+
     private Database $db_handler;
 
     public function __construct(Database $db_handler) {
@@ -578,6 +582,148 @@ class User {
             error_log("User::setPasswordResetToken - PDOException for user ID {$this->id}: " . $e->getMessage());
             return false;
         }
+    }
+
+    public function getPendingEmailAddress(): ?string
+    {
+        return $this->pending_email_address;
+    }
+
+    public function setPendingEmailAddress(?string $pending_email_address): void
+    {
+        $this->pending_email_address = $pending_email_address;
+    }
+
+    public function getPendingEmailTokenHash(): ?string
+    {
+        return $this->pending_email_token_hash;
+    }
+
+    // No direct setter for hash, it should be set via setPendingEmailChangeToken
+
+    public function getPendingEmailTokenExpiresAt(): ?string
+    {
+        return $this->pending_email_token_expires_at;
+    }
+
+    public function setPendingEmailChangeToken(string $token, int $validityHours = 1): void
+    {
+        if (empty($token)) {
+            $this->pending_email_token_hash = null;
+            $this->pending_email_token_expires_at = null;
+        } else {
+            $this->pending_email_token_hash = password_hash($token, PASSWORD_DEFAULT);
+            $this->pending_email_token_expires_at = date('Y-m-d H:i:s', time() + ($validityHours * 3600));
+        }
+    }
+
+    public function clearPendingEmailChange(): void
+    {
+        $this->pending_email_address = null;
+        $this->pending_email_token_hash = null;
+        $this->pending_email_token_expires_at = null;
+    }
+
+    public static function findByPendingEmailChangeToken(Database $db_handler, string $token): ?self
+    {
+        $conn = $db_handler->getConnection();
+        if (!$conn) {
+            error_log("User::findByPendingEmailChangeToken - Database connection failed.");
+            return null;
+        }
+        // We need to fetch all users and check the token, as we only store the hash.
+        // This is not ideal for performance on large tables.
+        // A more performant way would be to store the token selector and verifier separately.
+        // For now, this approach will work for smaller user bases.
+        try {
+            $stmt = $conn->prepare("SELECT * FROM users WHERE pending_email_token_hash IS NOT NULL AND pending_email_token_expires_at > NOW()");
+            $stmt->execute();
+            while ($userData = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                if (password_verify($token, $userData['pending_email_token_hash'])) {
+                    $user = new self($db_handler);
+                    $user->loadUserData($userData);
+                    return $user;
+                }
+            }
+            return null;
+        } catch (PDOException $e) {
+            error_log("User::findByPendingEmailChangeToken - PDOException: " . $e->getMessage());
+            return null;
+        }
+    }
+
+    public function savePendingEmailChange(): bool
+    {
+        if ($this->id === null) return false;
+
+        $conn = $this->db_handler->getConnection();
+        if (!$conn) return false;
+
+        $sql = "UPDATE users SET 
+                    pending_email_address = :pending_email_address,
+                    pending_email_token_hash = :pending_email_token_hash,
+                    pending_email_token_expires_at = :pending_email_token_expires_at,
+                    updated_at = NOW()
+                WHERE id = :id";
+        
+        $stmt = $conn->prepare($sql);
+        if ($stmt === false) {
+            error_log("User model (savePendingEmailChange): Failed to prepare statement: " . implode(":", $conn->errorInfo()));
+            return false;
+        }
+        return $stmt->execute([
+            ':pending_email_address' => $this->pending_email_address,
+            ':pending_email_token_hash' => $this->pending_email_token_hash,
+            ':pending_email_token_expires_at' => $this->pending_email_token_expires_at,
+            ':id' => $this->id
+        ]);
+    }
+
+    public function confirmEmailChange(): bool
+    {
+        if ($this->id === null || $this->pending_email_address === null) {
+            return false;
+        }
+
+        $this->email = $this->pending_email_address;
+        // Optionally, if email verification status should be reset:
+        // $this->is_active = 0; // Or some other status indicating re-verification needed for the new email
+        // $this->email_verified_at = null;
+        // $this->setEmailVerificationToken(bin2hex(random_bytes(32))); // Generate a new token for the new email
+
+        $this->clearPendingEmailChange(); // Clear pending fields
+
+        $conn = $this->db_handler->getConnection();
+        if (!$conn) return false;
+
+        // Update the main email and clear pending fields
+        $sql = "UPDATE users SET 
+                    email = :email,
+                    pending_email_address = NULL,
+                    pending_email_token_hash = NULL,
+                    pending_email_token_expires_at = NULL,
+                    -- email_verified_at = NULL, -- if re-verification is needed
+                    -- is_active = 0, -- if re-verification is needed
+                    -- email_verification_token_hash = :new_email_verification_token_hash, -- if re-verification is needed
+                    -- email_verification_expires_at = :new_email_verification_expires_at, -- if re-verification is needed
+                    updated_at = NOW()
+                WHERE id = :id";
+        
+        $stmt = $conn->prepare($sql);
+        if ($stmt === false) {
+            error_log("User model (confirmEmailChange): Failed to prepare statement: " . implode(":", $conn->errorInfo()));
+            return false;
+        }
+        
+        $params = [
+            ':email' => $this->email,
+            ':id' => $this->id
+        ];
+        // If re-verification is needed for the new email:
+        // $params[':new_email_verification_token_hash'] = $this->email_verification_token_hash;
+        // $params[':new_email_verification_expires_at'] = $this->email_verification_expires_at;
+
+        return $stmt->execute($params);
     }
 
     public static function getAvailableRoles(): array

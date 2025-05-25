@@ -24,7 +24,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         if (!isset($_POST['csrf_token_change_password']) || !hash_equals($_SESSION['csrf_token_change_password'] ?? '', $_POST['csrf_token_change_password'] ?? '')) {
             if(isset($flashMessageService)) $flashMessageService->addError('Security error: Invalid CSRF token for password change.');
         } else {
-            $success = $profileController->handleChangePasswordRequest($_POST);
+            $currentPassword = $_POST['current_password'] ?? '';
+            $newPassword = $_POST['new_password'] ?? '';
+            $confirmPassword = $_POST['confirm_password'] ?? '';
+            $success = $profileController->handleChangePasswordRequest($currentPassword, $newPassword, $confirmPassword);
             $_SESSION['csrf_token_change_password'] = bin2hex(random_bytes(32));
             if ($success) {
                 header('Location: /index.php?page=account_settings'); 
