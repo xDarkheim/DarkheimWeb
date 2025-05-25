@@ -1,0 +1,21 @@
+# Composer dependencies
+/vendor/
+
+# Configuration file with sensitive data
+# It's good practice to commit a template/example file (e.g., app_config.php.example)
+# and have the actual app_config.php ignored.
+/includes/config/app_config.php
+
+# Log files (if you have any, add their patterns)
+# *.log
+# logs/
+
+# IDE / Editor specific files
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# OS generated files
+.DS_Store
+Thumbs.db
