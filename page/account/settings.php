@@ -32,8 +32,8 @@ if (!isset($_SESSION['csrf_token_account_settings'])) {
 
 ?>
 
-<div class="form-page-container account-settings-container">
-    <h1><?php echo htmlspecialchars($page_title); ?></h1>
+<div class="page-container account-settings-container"> <!-- Ensured page-container for consistency, account-settings-container for specific styling -->
+    <h1 class="page-title"><?php echo htmlspecialchars($page_title); ?></h1>
 
     <?php
     // Display flash messages if any (e.g., after a redirect)

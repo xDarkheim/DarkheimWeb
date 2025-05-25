@@ -11,6 +11,7 @@ if (!isset($_SESSION['user_id'])) {
     exit();
 }
 $userId = (int)$_SESSION['user_id'];
+$current_user_role = $_SESSION['user_role'] ?? 'user'; // Get the role of the current user
 
 $profileController = new ProfileController($database_handler, $userId, $flashMessageService);
 $userData = $profileController->getCurrentUserData();
@@ -29,16 +30,31 @@ if ($database_handler && $pdo = $database_handler->getConnection()) {
         $stmt_comments->execute([$userId]);
         $user_comment_count = (int)$stmt_comments->fetchColumn();
 
-        $stmt_notifications = $pdo->prepare("SELECT COUNT(*) FROM notifications WHERE user_id = ? AND is_read = 0");
-        $stmt_notifications->execute([$userId]);
-        $user_notification_count = (int)$stmt_notifications->fetchColumn();
+        // Assume the notifications table exists
+        $table_exists_stmt = $pdo->query("SHOW TABLES LIKE 'notifications'");
+        if ($table_exists_stmt && $table_exists_stmt->rowCount() > 0) {
+            $stmt_notifications = $pdo->prepare("SELECT COUNT(*) FROM notifications WHERE user_id = ? AND is_read = 0");
+            $stmt_notifications->execute([$userId]);
+            $user_notification_count = (int)$stmt_notifications->fetchColumn();
+        } else {
+            $user_notification_count = 0; // Table does not exist, no notifications
+            error_log("Dashboard Stats: 'notifications' table not found for user ID $userId.");
+        }
 
     } catch (PDOException $e) {
         error_log("Dashboard Stats Error for user ID $userId: " . $e->getMessage());
+        // Set default values in case of an error so the page doesn't break
+        $user_article_count = $user_article_count ?? 0;
+        $user_comment_count = $user_comment_count ?? 0;
+        $user_notification_count = $user_notification_count ?? 0;
     }
 } else {
     error_log("Dashboard: Database handler or connection not available for user ID $userId. Stats will be 0.");
+    $user_article_count = 0;
+    $user_comment_count = 0;
+    $user_notification_count = 0;
 }
+
 
 if (!$userData) {
     $userData = [
@@ -55,10 +71,59 @@ if (!$userData) {
     error_log("Dashboard: User data loaded: " . print_r($userData, true));
 }
 
+// Define personal quick actions
+$personal_actions = [
+    [
+        'url' => '/index.php?page=create_article',
+        'text' => 'Create New Article',
+        'description' => 'Write and publish a new blog post',
+        'icon' => 'fas fa-pencil-alt', // Icon for create
+        'roles' => ['user', 'editor', 'admin'] // Available to everyone who can write
+    ],
+    [
+        'url' => '/index.php?page=manage_articles',
+        'text' => 'Manage My Articles',
+        'description' => 'View, edit, delete your blog posts',
+        'icon' => 'fas fa-list-alt', // Icon for manage
+        'roles' => ['user', 'editor', 'admin'] // Available to everyone who can write
+    ],
+    [
+        'url' => '/index.php?page=account_edit_profile',
+        'text' => 'Edit My Profile',
+        'description' => 'Update username, email, location, bio, and website URL',
+        'icon' => 'fas fa-user-edit',
+        'roles' => ['user', 'editor', 'admin'] // Available to all
+    ],
+    [
+        'url' => '/index.php?page=account_settings',
+        'text' => 'Account Settings',
+        'description' => 'Manage account settings, security parameters, etc.',
+        'icon' => 'fas fa-user-cog', // Icon for account settings
+        'roles' => ['user', 'editor', 'admin'] // Available to all
+    ]
+];
+
+$site_management_config = [];
+$quick_links_file_path = ROOT_PATH . '/includes/config/quick_links_config.php';
+if (file_exists($quick_links_file_path)) {
+    $site_management_config = include $quick_links_file_path;
+} else {
+    error_log("Dashboard: Admin quick links config file not found at: " . $quick_links_file_path);
+}
+
+
+function can_user_access_action(array $action_roles, string $current_user_role): bool {
+    // If the roles array is empty, by default assume access is granted (or change the logic)
+    if (empty($action_roles)) return true;
+    return in_array($current_user_role, $action_roles);
+}
+
 ?>
 
 <div class="page-container dashboard-container">
-    <h2 class="dashboard-header">My Dashboard</h2>
+    <header class="page-header">
+        <h1 class="page-title dashboard-header">My Dashboard</h1>
+    </header>
 
     <p class="dashboard-welcome-message">
         Welcome back, <strong><?php echo htmlspecialchars($userData['username'] ?? 'User'); ?></strong>!
@@ -66,22 +131,22 @@ if (!$userData) {
             <br><span class="user-current-status">Current status: <?php echo htmlspecialchars($userData['user_status']); ?></span>
         <?php endif; ?>
     </p>
-    <p class="dashboard-intro">Here you can manage your articles, profile, and account settings for the blog.</p>
+    <p class="dashboard-intro">Here you can manage your articles, profile, and account settings.</p>
 
     <!-- Overview Cards Section (Stats) -->
     <div class="dashboard-overview">
         <div class="overview-card">
-            <span class="overview-card-icon">📄</span>
+            <?php /* <span class="overview-card-icon"><i class="fas fa-file-alt"></i></span> */ ?>
             <span class="overview-card-value"><?php echo $user_article_count; ?></span>
             <span class="overview-card-label">Your Articles</span>
         </div>
         <div class="overview-card">
-            <span class="overview-card-icon">💬</span>
+            <?php /* <span class="overview-card-icon"><i class="fas fa-comments"></i></span> */ ?>
             <span class="overview-card-value"><?php echo $user_comment_count; ?></span>
             <span class="overview-card-label">Your Comments</span>
         </div>
         <div class="overview-card">
-            <span class="overview-card-icon">🔔</span>
+            <?php /* <span class="overview-card-icon"><i class="fas fa-bell"></i></span> */ ?>
             <span class="overview-card-value"><?php echo $user_notification_count; ?></span>
             <span class="overview-card-label">Notifications</span>
         </div>
@@ -100,7 +165,7 @@ if (!$userData) {
             <li><strong>Website:</strong> <a href="<?php echo htmlspecialchars($userData['website_url']); ?>" target="_blank" rel="noopener noreferrer"><?php echo htmlspecialchars($userData['website_url']); ?></a></li>
             <?php endif; ?>
             <?php if (!empty($userData['bio'])): ?>
-            <li class="profile-bio"><strong>Bio:</strong> <p><?php echo nl2br(htmlspecialchars($userData['bio'])); ?></p></li>
+            <li class="profile-bio"><strong>About me:</strong> <p><?php echo nl2br(htmlspecialchars($userData['bio'])); ?></p></li>
             <?php endif; ?>
         </ul>
         <p class="snapshot-edit-link">
@@ -108,48 +173,56 @@ if (!$userData) {
         </p>
     </div>
 
-    <!-- Quick Actions Section -->
+    <!-- Personal Quick Actions Section -->
     <h3 class="dashboard-section-title">Quick Actions</h3>
     <ul class="dashboard-actions">
-        <li>
-            <a href="/index.php?page=create_article">
-                Create New Article
-                <span class="action-status">(Write & Publish a new blog post)</span>
-            </a>
-        </li>
-        <li>
-            <a href="/index.php?page=manage_articles">
-                Manage My Articles
-                <span class="action-status">(View, Edit, Delete your blog posts)</span>
-            </a>
-        </li>
-        <li>
-            <a href="/index.php?page=account_edit_profile">
-                Edit My Profile
-                <span class="action-status">(Update username, email, location, bio, and website URL)</span>
-            </a>
-        </li>
-        <li>
-            <a href="/index.php?page=account_settings">
-                Account Settings
-                <span class="action-status">(Manage account preferences, security settings, and more)</span>
-            </a>
-        </li>
-        <?php 
-        // Additional actions for admin users
-        if (isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'admin'): ?>
-        <li>
-            <a href="/index.php?page=site_settings">
-                Site Settings
-                <span class="action-status">(Manage global website settings)</span>
-            </a>
-        </li>
-        <li>
-            <a href="/index.php?page=manage_users">
-                Manage Users
-                <span class="action-status">(View and manage user accounts)</span>
-            </a>
-        </li>
-        <?php endif; ?>
+        <?php foreach ($personal_actions as $action): ?>
+            <?php if (can_user_access_action($action['roles'], $current_user_role)): ?>
+            <li>
+                <a href="<?php echo htmlspecialchars($action['url']); ?>">
+                    <div class="action-main-content">
+                        <?php /* if (!empty($action['icon'])): ?><i class="<?php echo htmlspecialchars($action['icon']); ?> fa-fw"></i><?php endif; */ ?>
+                        <span class="action-text"><?php echo htmlspecialchars($action['text']); ?></span>
+                    </div>
+                    <?php if (!empty($action['description'])): ?>
+                        <span class="action-status"><?php echo htmlspecialchars(trim(str_replace(['(', ')'], '', $action['description']))); ?></span>
+                    <?php endif; ?>
+                </a>
+            </li>
+            <?php endif; ?>
+        <?php endforeach; ?>
     </ul>
+
+    <?php 
+    // Display the "Site Management" section
+    if (!empty($site_management_config['links']) && isset($site_management_config['title'])):
+        $has_accessible_admin_links = false;
+        foreach ($site_management_config['links'] as $link) {
+            if (can_user_access_action($link['roles'], $current_user_role)) {
+                $has_accessible_admin_links = true;
+                break;
+            }
+        }
+
+        if ($has_accessible_admin_links):
+    ?>
+    <h3 class="dashboard-section-title" style="margin-top: var(--spacing-6);"><?php echo htmlspecialchars($site_management_config['title']); ?></h3>
+    <ul class="dashboard-actions"> <?php // Reuse .dashboard-actions class ?>
+        <?php foreach ($site_management_config['links'] as $action): ?>
+            <?php if (can_user_access_action($action['roles'], $current_user_role)): ?>
+            <li>
+                <a href="<?php echo htmlspecialchars($action['url']); ?>">
+                    <div class="action-main-content">
+                        <?php /* if (!empty($action['icon'])): ?><i class="<?php echo htmlspecialchars($action['icon']); ?> fa-fw"></i><?php endif; */ ?>
+                        <span class="action-text"><?php echo htmlspecialchars($action['text']); ?></span>
+                    </div>
+                    <?php if (!empty($action['description'])): ?>
+                        <span class="action-status"><?php echo htmlspecialchars(trim(str_replace(['(', ')'], '', $action['description']))); ?></span>
+                    <?php endif; ?>
+                </a>
+            </li>
+            <?php endif; ?>
+        <?php endforeach; ?>
+    </ul>
+    <?php endif; endif; ?>
 </div>

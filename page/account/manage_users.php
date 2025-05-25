@@ -156,9 +156,10 @@ if (empty($csrf_token) && function_exists('random_bytes')) {
                                         <i class="fas fa-edit"></i> Edit
                                     </a>
                                     <?php if (isset($_SESSION['user_id']) && $_SESSION['user_id'] !== $user['id']):  ?>
-                                    <form action="/index.php?page=manage_users&action=delete_user" method="POST" style="display: inline-block; margin-left: var(--spacing-1);" onsubmit="return confirm('Are you sure you want to delete this user? This action cannot be undone.');">
+                                    <form action="/index.php?page=manage_users" method="POST" style="display: inline-block; margin-left: var(--spacing-1);" onsubmit="return confirm('Are you sure you want to delete this user? This action cannot be undone.');">
                                         <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($csrf_token); ?>">
                                         <input type="hidden" name="user_id_to_delete" value="<?php echo $user['id']; ?>">
+                                        <input type="hidden" name="action" value="delete_user">
                                         <button type="submit" class="button button-small button-danger" title="Delete User">
                                             <i class="fas fa-trash-alt"></i> Delete
                                         </button>

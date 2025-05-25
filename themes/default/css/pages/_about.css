@@ -1,0 +1,74 @@
+/* About Page Specific Styles */
+
+.about-page-container .page-title {
+    text-align: center;
+    margin-bottom: var(--spacing-5);
+}
+
+.about-section {
+    margin-bottom: var(--spacing-5);
+    padding: var(--spacing-4);
+    background-color: var(--color-surface);
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-sm);
+}
+.about-section:last-child {
+    margin-bottom: 0;
+}
+
+.about-section h2 {
+    font-size: var(--font-size-xl);
+    color: var(--color-headings);
+    margin-top: 0;
+    margin-bottom: var(--spacing-3);
+    padding-bottom: var(--spacing-2);
+    border-bottom: 1px solid var(--color-border-extralight);
+    font-family: var(--font-secondary);
+}
+
+.about-intro-text p {
+    font-size: var(--font-size-md);
+    line-height: 1.7;
+    color: var(--color-text);
+}
+.about-intro-text p strong {
+    color: var(--color-primary);
+}
+
+.tech-focus-section p,
+.about-section p {
+    line-height: 1.6;
+    margin-bottom: var(--spacing-2);
+}
+
+.tech-list,
+.about-section ul {
+    list-style: none;
+    padding-left: 0;
+}
+
+.tech-list li,
+.about-section ul li {
+    padding-left: var(--spacing-3);
+    position: relative;
+    margin-bottom: var(--spacing-2);
+    line-height: 1.6;
+}
+
+.tech-list li::before,
+.about-section ul li::before {
+    content: "\2713"; /* Checkmark icon */
+    color: var(--color-primary);
+    position: absolute;
+    left: 0;
+    font-weight: bold;
+}
+
+.about-section a {
+    color: var(--color-primary);
+    text-decoration: underline;
+}
+.about-section a:hover {
+    color: var(--color-primary-dark);
+    text-decoration: none;
+}

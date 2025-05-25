@@ -191,9 +191,9 @@ $pageTitle = "Edit Article: " . htmlspecialchars($title_form ?: "ID " . ($articl
 
 ?>
 
-<div class="page-container edit-article-page">
+<div class="page-container edit-article-page"> <!-- Ensured page-container for consistency -->
     <a href="/index.php?page=manage_articles" class="button button-secondary form-page-back-link">&laquo; Back to Manage Articles</a>
-    <h1><?php echo htmlspecialchars($pageTitle); ?></h1>
+    <h1 class="page-title"><?php echo htmlspecialchars($pageTitle); ?></h1>
     
     <form action="/index.php?page=edit_article" method="POST" class="styled-form edit-article-form">
         <input type="hidden" name="article_id" value="<?php echo htmlspecialchars($article_id ?? ''); ?>">

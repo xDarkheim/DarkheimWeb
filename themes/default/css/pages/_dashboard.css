@@ -1,0 +1,226 @@
+/* ==========================================================================
+   Dashboard Page Styles (/page/account/dashboard.php)
+   ========================================================================== */
+.dashboard-container {
+    min-width: 800px; /* Минимальная ширина для страницы */
+    width: 100%;
+}
+
+.dashboard-header { /* Это H2 в PHP */
+    font-size: var(--font-size-xxxl); /* 32px -> 2rem */
+    color: var(--color-headings);
+    margin-bottom: var(--spacing-4); /* 24px */
+    padding-bottom: var(--spacing-3); /* 16px */
+    border-bottom: 1px solid var(--color-border-extralight);
+    text-align: left; /* или center */
+}
+
+.dashboard-welcome-message {
+    font-size: var(--font-size-lg); /* 18px */
+    color: var(--color-text);
+    margin-bottom: var(--spacing-1); /* 4px */
+    /* text-align: left; или center */
+}
+.dashboard-welcome-message .user-current-status {
+    font-size: var(--font-size-sm); /* 14px */
+    color: var(--color-text-muted);
+    display: block;
+    margin-top: var(--spacing-0); /* 2px */
+}
+
+.dashboard-intro {
+    font-size: var(--font-size-md); /* 16px */
+    color: var(--color-text-secondary);
+    margin-bottom: var(--spacing-5); /* 32px */
+    /* text-align: left; или center */
+    max-width: 700px;
+    /* margin-left: auto; */ /* Если text-align: center */
+    /* margin-right: auto; */ /* Если text-align: center */
+}
+
+.dashboard-section-title { /* Это H3 в PHP */
+    font-size: var(--font-size-xxl); /* 24px */
+    color: var(--color-headings);
+    margin-top: var(--spacing-5); /* 32px */
+    margin-bottom: var(--spacing-3); /* 16px */
+    padding-bottom: var(--spacing-2); /* 8px */
+    border-bottom: 1px solid var(--color-border-extralight);
+}
+
+/* Overview Cards Section */
+.dashboard-overview {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
+    gap: var(--spacing-4); /* 24px */
+    margin-bottom: var(--spacing-5); /* 32px */
+}
+
+.overview-card {
+    background-color: var(--color-surface-accent);
+    padding: var(--spacing-3) var(--spacing-4); /* 16px 24px */
+    border-radius: var(--border-radius-lg); /* 8px */
+    text-align: center;
+    border: 1px solid var(--color-border);
+    box-shadow: var(--shadow-sm);
+    transition: transform var(--transition-duration) ease, box-shadow var(--transition-duration) ease;
+}
+
+.overview-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-md);
+}
+
+.overview-card-value {
+    font-size: var(--font-size-xxxl); /* 32px */
+    font-weight: var(--font-weight-bold);
+    color: var(--color-headings);
+    display: block;
+    margin-bottom: var(--spacing-1); /* 4px */
+    line-height: 1.1;
+    /* Можно добавить верхний отступ, если иконки нет */
+    /* margin-top: var(--spacing-2); */
+}
+
+/* Profile Snapshot Section */
+.dashboard-profile-snapshot {
+    background-color: var(--color-surface-accent);
+    padding: var(--spacing-4); /* 24px */
+    border-radius: var(--border-radius-lg);
+    margin-bottom: var(--spacing-5); /* 32px */
+    border: 1px solid var(--color-border);
+    box-shadow: var(--shadow-sm);
+}
+
+.dashboard-profile-snapshot .dashboard-section-title {
+    margin-top: 0;
+    border-bottom: 1px solid var(--color-border);
+    padding-bottom: var(--spacing-3); /* 16px */
+    margin-bottom: var(--spacing-3); /* 16px */
+}
+
+.profile-details-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 var(--spacing-3) 0; /* 16px bottom margin */
+}
+
+.profile-details-list li {
+    padding: var(--spacing-2) 0; /* 8px top/bottom padding */
+    border-bottom: 1px solid var(--color-border-extralight);
+    font-size: var(--font-size-md);
+    color: var(--color-text);
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+}
+
+.profile-details-list li:last-child {
+    border-bottom: none;
+}
+
+.profile-details-list li strong {
+    color: var(--color-headings);
+    margin-right: var(--spacing-2); /* 8px */
+    flex-shrink: 0;
+    width: 120px; /* Adjust as needed for alignment */
+}
+
+.profile-details-list li span,
+.profile-details-list li a { /* For email, website etc. */
+    color: var(--color-text-secondary);
+    word-break: break-word;
+}
+.profile-details-list li a {
+    color: var(--color-primary-light);
+}
+.profile-details-list li a:hover {
+    color: var(--color-primary);
+}
+
+
+.profile-details-list li.profile-bio strong {
+    width: 100%; /* Label takes full width */
+    margin-bottom: var(--spacing-1);
+}
+.profile-details-list li.profile-bio p {
+    margin-top: 0;
+    margin-bottom: 0;
+    padding-left: 0; /* No indent if label is full width */
+    color: var(--color-text-secondary);
+    width: 100%;
+    line-height: 1.6;
+}
+
+.snapshot-edit-link {
+    text-align: right;
+    margin-top: var(--spacing-3); /* 16px */
+}
+
+/* Quick Actions Section */
+.dashboard-actions {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 var(--spacing-5) 0; /* 32px bottom margin for the section */
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
+    gap: var(--spacing-4); /* 24px */
+}
+
+.dashboard-actions li {
+    margin-bottom: 0; /* Reset li margin */
+}
+
+.dashboard-actions li a {
+    display: flex;
+    flex-direction: column;
+    background-color: var(--color-surface-accent);
+    padding: var(--spacing-3) var(--spacing-4); /* 16px 24px */
+    border-radius: var(--border-radius-lg); /* 8px */
+    color: var(--color-text);
+    text-decoration: none;
+    border: 1px solid var(--color-border);
+    box-shadow: var(--shadow-sm);
+    transition: background-color var(--transition-duration) ease,
+                border-color var(--transition-duration) ease,
+                transform var(--transition-duration) ease,
+                box-shadow var(--transition-duration) ease;
+    height: 100%; /* Ensure cards in a row have the same height */
+}
+
+.dashboard-actions li a:hover {
+    background-color: var(--color-surface-hover);
+    border-color: var(--color-primary);
+    color: var(--color-primary-light); /* Keep text readable on hover */
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-md);
+    text-decoration: none;
+}
+
+.dashboard-actions li a .action-main-content {
+    display: flex;
+    /* align-items: center; */ /* Можно убрать, если нет иконки */
+    margin-bottom: var(--spacing-2); /* 8px */
+}
+
+.dashboard-actions li a .action-text {
+    font-size: var(--font-size-lg); /* 18px */
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-headings);
+    line-height: 1.3;
+    /* Если иконки нет, можно убрать левый отступ, если он был из-за иконки */
+    /* margin-left: 0; */
+}
+.dashboard-actions li a:hover .action-text {
+    color: var(--color-primary-light);
+}
+
+.dashboard-actions li a .action-status {
+    font-size: var(--font-size-sm); /* 14px */
+    color: var(--color-text-muted);
+    line-height: 1.5;
+    margin-top: auto; /* Pushes description to bottom if content above is short */
+    padding-top: var(--spacing-1); /* Add some space if it's pushed down */
+}
+.dashboard-actions li a:hover .action-status {
+    color: var(--color-text-secondary);
+}

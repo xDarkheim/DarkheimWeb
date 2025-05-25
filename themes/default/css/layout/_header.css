@@ -1,0 +1,87 @@
+/* Layout: Site Header */
+.site-header {
+    background-color: var(--color-surface); /* Dark surface for header */
+    padding: var(--spacing-3) var(--spacing-4);
+    border-bottom: 1px solid var(--color-border); /* Subtle border */
+    box-shadow: var(--shadow-sm);
+    position: sticky; /* Make header sticky */
+    top: 0;
+    z-index: 1000; /* Ensure it's above other content */
+}
+
+.header-container {
+    max-width: 1200px; /* Or your preferred max-width */
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo a {
+    font-size: 1.75rem; /* Larger logo text */
+    font-weight: 700;
+    color: var(--color-primary-light); /* Use a lighter primary for logo */
+    text-decoration: none;
+    font-family: var(--font-secondary);
+    letter-spacing: -0.05em; /* Graphic touch */
+}
+
+.logo a:hover {
+    color: var(--color-primary);
+    opacity: 1; /* No opacity change for logo */
+}
+
+/* Layout: Main Navigation (in Header) */
+.main-navigation ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    gap: var(--spacing-3); /* Spacing between nav items */
+}
+
+.main-navigation li {
+    margin: 0;
+}
+
+.main-navigation a {
+    color: var(--color-text);
+    text-decoration: none;
+    padding: var(--spacing-2) var(--spacing-1);
+    font-weight: 500;
+    border-radius: var(--border-radius-sm);
+    transition: color var(--transition-duration) var(--transition-timing-function),
+                background-color var(--transition-duration) var(--transition-timing-function);
+}
+
+.main-navigation a:hover,
+.main-navigation a.active { /* Style for active link */
+    color: var(--color-primary-contrast);
+    background-color: var(--color-primary); /* Accent color for hover/active */
+    text-decoration: none;
+    opacity: 1;
+}
+
+/* User-specific nav buttons from config */
+.main-navigation a.nav-button {
+    padding: var(--spacing-1) var(--spacing-3);
+    border: 1px solid var(--color-primary);
+    color: var(--color-primary-light);
+}
+.main-navigation a.nav-button:hover,
+.main-navigation a.nav-button.active {
+    background-color: var(--color-primary);
+    color: var(--color-primary-contrast);
+    border-color: var(--color-primary);
+}
+
+
+/* Mobile Navigation Toggle */
+.mobile-nav-toggle {
+    display: none; /* Hidden by default, shown in media query */
+    background: none;
+    border: none;
+    color: var(--color-text);
+    font-size: 1.8rem;
+    cursor: pointer;
+}

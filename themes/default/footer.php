@@ -3,7 +3,7 @@
 
     <footer class="site-footer">
         <div class="footer-content">
-            <p>&copy; <?php echo date("Y"); ?> DarkheimHub. All rights reserved.</p>
+            <p>&copy; <?php echo date("Y"); ?> Darkheim Universe. All rights reserved.</p>
         </div>
     </footer>
 

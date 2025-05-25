@@ -60,7 +60,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $confirmPassword = $_POST['confirm_password'] ?? '';
         
         $profileController->handleChangePasswordRequest($currentPassword, $newPassword, $confirmPassword);
-    } // <<<< ДОБАВЛЕНА ЭТА ЗАКРЫВАЮЩАЯ СКОБКА
+    } // <<<< THIS CLOSING BRACE WAS ADDED
 
     if (isset($_POST['update_profile_info']) || isset($_POST['change_password_submit'])) {
         header('Location: /index.php?page=account_edit_profile');
@@ -74,7 +74,12 @@ if (!$userData) {
         'location' => '', 'user_status' => '', 'bio' => '', 'website_url' => ''
     ];
     if (empty($page_message['text'])) {
-      $page_message = ['text' => 'Failed to load user data.', 'type' => 'error'];
+      // Use FlashMessageService if available and preferred for consistency
+      if (isset($flashMessageService)) {
+          $flashMessageService->addError('Failed to load user data.');
+      } else {
+          $page_message = ['text' => 'Failed to load user data.', 'type' => 'error'];
+      }
     }
     error_log("Edit Profile Page: Could not load user data for user ID: " . $userId);
 }
@@ -83,7 +88,12 @@ if (!$userData) {
 <div class="form-page-container account-settings-container">
     <h1>Edit Profile Information</h1>
 
-    <?php if (!empty($page_message['text'])): ?>
+    <?php 
+    // Flash messages will be displayed globally by webengine.php
+    // This local message display can be removed if global display is sufficient
+    // or kept for messages specific to this page load before redirect.
+    if (!empty($page_message['text']) && !isset($flashMessageService)) : // Only show if flash service isn't handling it
+    ?>
         <div class="messages <?php echo htmlspecialchars($page_message['type'] === 'success' ? 'success' : ($page_message['type'] === 'info' ? 'info' : 'errors')); ?>">
             <p><?php echo htmlspecialchars($page_message['text']); ?></p>
         </div>
@@ -159,6 +169,8 @@ if (!$userData) {
             </div>
         </form>
     </div>
+
+    <hr class="section-divider"> <!-- Added for visual separation -->
 
     <div class="settings-section password-change-section">
         <h2>Change Password</h2>

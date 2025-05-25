@@ -1,0 +1,194 @@
+/* Ensure Darkheim widgets in sidebar use new variables */
+.sidebar .darkheim-widget {
+    background-color: var(--color-surface);
+    color: var(--color-text);
+    border: 1px solid var(--color-border); /* Use global border color */
+    box-shadow: var(--shadow-md); /* Use global shadow */
+}
+
+.sidebar .darkheim-widget .user-widget__avatar {
+    background-color: var(--color-primary);
+    color: var(--color-primary-contrast);
+    border: 2px solid var(--color-primary-light);
+}
+.sidebar .darkheim-widget .user-widget__username {
+    color: var(--color-headings);
+}
+.sidebar .darkheim-widget .user-widget__nav a {
+    color: var(--color-primary-light);
+}
+.sidebar .darkheim-widget .user-widget__nav a:hover {
+    color: var(--color-primary);
+}
+.sidebar .darkheim-widget .user-widget__nav a.logout-link {
+    color: var(--color-danger);
+}
+.sidebar .darkheim-widget .user-widget__nav a.logout-link:hover {
+    color: var(--color-danger);
+    opacity: var(--hover-opacity);
+}
+
+.sidebar .darkheim-widget .form-group label {
+    color: var(--color-text-muted);
+}
+.sidebar .darkheim-widget .form-input {
+    background-color: var(--color-surface-accent);
+    color: var(--color-text);
+    border: 1px solid var(--color-border-light);
+}
+.sidebar .darkheim-widget .form-input:focus {
+    border-color: var(--color-border-focus);
+    box-shadow: var(--shadow-outline);
+}
+.sidebar .darkheim-widget .form-button {
+    background-color: var(--color-primary);
+    color: var(--color-primary-contrast);
+}
+.sidebar .darkheim-widget .form-button:hover {
+    background-color: var(--color-primary-dark);
+}
+.sidebar .darkheim-widget .register-prompt {
+    color: var(--color-text-muted);
+}
+.sidebar .darkheim-widget .register-link {
+    color: var(--color-primary-light);
+}
+.sidebar .darkheim-widget .register-link:hover {
+    color: var(--color-primary);
+}
+
+/* Darkheim Widget Style (applied to .user-widget and .login-widget) */
+.darkheim-widget {
+    background-color: var(--color-surface);
+    color: var(--color-text);
+    padding: var(--spacing-4); /* Increased padding for a more spacious feel */
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-md);
+}
+
+/* User Widget Specifics */
+.user-widget.darkheim-widget .user-widget__header {
+    display: flex;
+    align-items: center;
+    margin-bottom: var(--spacing-3);
+    padding-bottom: var(--spacing-3);
+    border-bottom: 1px solid var(--color-border-extralight);
+}
+
+.user-widget.darkheim-widget .user-widget__avatar {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    background-color: var(--color-primary);
+    color: var(--color-primary-contrast);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4em;
+    font-weight: bold;
+    margin-right: var(--spacing-3);
+    border: 2px solid var(--color-primary-light);
+}
+
+.user-widget.darkheim-widget .user-widget__username {
+    font-size: 1.1em;
+    font-weight: bold;
+    color: var(--color-headings);
+}
+
+.user-widget.darkheim-widget .user-widget__nav ul,
+.user-widget.darkheim-widget .user-widget__nav {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.user-widget.darkheim-widget .user-widget__nav li {
+    margin-bottom: var(--spacing-1);
+}
+
+.user-widget.darkheim-widget .user-widget__nav a {
+    color: var(--color-primary-light);
+    text-decoration: none;
+    padding: var(--spacing-2) 0; /* More vertical padding */
+    display: block;
+    transition: color var(--transition-duration) ease, padding-left var(--transition-duration) ease;
+    font-size: 0.95em;
+    border-radius: var(--border-radius-sm);
+}
+
+.user-widget.darkheim-widget .user-widget__nav a:hover {
+    color: var(--color-primary);
+    padding-left: var(--spacing-1);
+    background-color: rgba(var(--color-primary-rgb), 0.1); /* Subtle hover background */
+}
+
+.user-widget.darkheim-widget .user-widget__nav a.logout-link {
+    color: var(--color-danger);
+}
+
+.user-widget.darkheim-widget .user-widget__nav a.logout-link:hover {
+    color: var(--color-danger);
+    opacity: var(--hover-opacity);
+    background-color: rgba(var(--color-danger-rgb), 0.1);
+}
+
+/* Login Widget Specifics */
+.login-widget.darkheim-widget .login-form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-2); /* Reduced gap for a tighter form */
+}
+
+.login-widget.darkheim-widget .register-prompt {
+    font-size: 0.9em;
+    color: var(--color-text-muted);
+}
+
+.login-widget.darkheim-widget .register-link {
+    color: var(--color-primary-light);
+    text-decoration: none;
+    font-weight: 500; /* Slightly less bold than default strong */
+}
+
+.login-widget.darkheim-widget .register-link:hover {
+    color: var(--color-primary);
+    text-decoration: underline;
+}
+
+/* Quick Links Widget (if in sidebar) */
+.quick-links-widget {
+    margin-top: 20px; /* Top margin for the "Site Management" block */
+    padding-top: 15px; /* Top padding */
+    border-top: 1px solid var(--color-border-light); /* Top separator line, if needed */
+}
+
+.quick-links-widget .widget-title { /* Styles for "Site Management" title */
+    margin-bottom: 0.5em; /* Bottom margin from title to list */
+    font-size: 1.1em; /* Slightly increase title font size */
+    color: var(--color-headings);
+}
+
+.quick-links-list {
+    list-style-type: none; /* Removes list markers */
+    padding-left: 0;      /* Removes left padding added for markers */
+    margin-top: 0.5em;    /* Small top margin from title */
+}
+
+.quick-links-list li a {
+    display: block; /* Make link span full width of li for easier clicking */
+    padding: 8px 0; /* Vertical padding for links */
+    text-decoration: none;
+    color: var(--color-primary-light);
+}
+.quick-links-list li a:hover {
+    color: var(--color-primary);
+}
+
+/* Styles for user-account-widget, if a separator or bottom margin is needed */
+.user-account-widget {
+    padding-bottom: 15px; /* Bottom padding */
+    margin-bottom: 20px; /* Bottom margin to the next block */
+    border-bottom: 1px solid var(--color-border-light); /* Bottom separator line, if needed */
+}

@@ -76,7 +76,14 @@ if (!empty($articles_list)) {
 
 <div class="page-container manage-articles-page">
     <div class="page-header">
-        <h1><?php echo htmlspecialchars($page_title); ?></h1>
+        <h1 class="page-title"><?php echo htmlspecialchars($page_title); ?></h1>
+        <?php if ($user_role === User::ROLE_ADMIN || $user_role === User::ROLE_EDITOR): // ROLE_EDITOR needs to be defined in User model ?>
+            <div class="page-header-actions">
+                <a href="/index.php?page=create_article" class="button button-primary">
+                    <i class="fas fa-plus"></i> Create New Article
+                </a>
+            </div>
+        <?php endif; ?>
     </div>
 
     <?php if (!$db_connection_error && empty($articles_view_data) && !$total_articles): ?>

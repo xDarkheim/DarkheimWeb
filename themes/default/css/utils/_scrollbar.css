@@ -1,0 +1,21 @@
+/* Scrollbar Styling (Optional, but fits graphic theme) */
+/* For Webkit browsers */
+::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+::-webkit-scrollbar-track {
+    background: var(--color-surface-accent);
+    border-radius: var(--border-radius-pill);
+}
+::-webkit-scrollbar-thumb {
+    background: var(--color-secondary);
+    border-radius: var(--border-radius-pill);
+    border: 2px solid var(--color-surface-accent); /* Creates padding around thumb */
+}
+::-webkit-scrollbar-thumb:hover {
+    background: var(--color-secondary-light);
+}
+/* For Firefox (limited styling) */
+/* body { scrollbar-color: var(--color-secondary) var(--color-surface-accent); } */
+/* Uncomment above if you want basic Firefox scrollbar styling */

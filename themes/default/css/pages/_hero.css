@@ -1,0 +1,240 @@
+/* ==========================================================================
+    Home Page Styles (/page/home.php)
+    ========================================================================== */
+
+/* Hero Section */
+.hero-section {
+     background-color: var(--color-surface-accent); /* Or var(--color-background) if you want it darker */
+     padding: var(--spacing-6) var(--spacing-4);
+     text-align: center;
+     color: var(--color-primary-contrast); /* If the background is dark, the text is light */
+     border-bottom: 1px solid var(--color-border);
+}
+
+.hero-content {
+     max-width: 800px;
+     margin-left: auto;
+     margin-right: auto;
+}
+
+.hero-title {
+     font-size: 2.8rem; /* 44.8px, slightly larger than standard h1 */
+     color: var(--color-primary-light); /* Accent color for the title */
+     margin-top: 0;
+     margin-bottom: var(--spacing-3);
+     font-weight: var(--font-weight-bold);
+     letter-spacing: -0.04em;
+}
+
+.hero-subtitle {
+     font-size: var(--font-size-lg); /* 18px */
+     color: var(--color-text); /* Use the main text color if the background is --color-surface-accent */
+     /* color: var(--color-text-muted); */ /* If the background is --color-background and the text should be lighter */
+     margin-bottom: var(--spacing-4);
+     line-height: 1.7;
+     max-width: 650px;
+     margin-left: auto;
+     margin-right: auto;
+}
+
+.hero-actions {
+     display: flex;
+     justify-content: center;
+     gap: var(--spacing-3);
+     flex-wrap: wrap;
+}
+.hero-actions .button {
+     min-width: 180px; /* To make the buttons wider */
+     padding-top: var(--spacing-2);
+     padding-bottom: var(--spacing-2);
+}
+
+
+/* General Home Section Styling */
+.home-section {
+     padding: var(--spacing-5) var(--spacing-4); /* Vertical and horizontal padding */
+     /* max-width: 1200px; */ /* If you want to limit the width of sections on the main page */
+     /* margin-left: auto; */
+     /* margin-right: auto; */
+}
+.home-section:not(:last-child) {
+     border-bottom: 1px solid var(--color-border-extralight);
+}
+
+.home-section .section-title { /* h2 in home.php */
+     font-size: var(--font-size-xxxl); /* 32px */
+     color: var(--color-headings);
+     text-align: center;
+     margin-top: 0;
+     margin-bottom: var(--spacing-5); /* Larger indent under the section title */
+     position: relative;
+     padding-bottom: var(--spacing-3);
+}
+
+.home-section .section-title::after { /* Decorative underlining element */
+     content: '';
+     display: block;
+     width: 80px;
+     height: 3px;
+     background-color: var(--color-primary);
+     margin: var(--spacing-2) auto 0;
+     border-radius: var(--border-radius-pill);
+}
+
+/* Latest Posts Section */
+.latest-posts .posts-grid {
+     display: grid;
+     grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); /* Adaptive columns */
+     gap: var(--spacing-4);
+}
+
+.post-card {
+     background-color: var(--color-surface-accent);
+     border-radius: var(--border-radius-lg);
+     box-shadow: var(--shadow-md);
+     overflow: hidden;
+     display: flex;
+     flex-direction: column;
+     transition: transform var(--transition-duration) ease, box-shadow var(--transition-duration) ease;
+     border: 1px solid var(--color-border);
+}
+
+.post-card:hover {
+     transform: translateY(-5px);
+     box-shadow: var(--shadow-lg);
+}
+
+.post-card-image-link {
+     display: block;
+}
+
+.post-card-image {
+     width: 100%;
+     height: 180px; /* Fixed height for card images */
+     object-fit: cover;
+     border-bottom: 1px solid var(--color-border-extralight);
+     filter: grayscale(20%) contrast(105%);
+     transition: filter var(--transition-duration-long) ease;
+}
+.post-card:hover .post-card-image {
+     filter: grayscale(0%) contrast(100%);
+}
+
+.post-card-content {
+     padding: var(--spacing-3) var(--spacing-4);
+     display: flex;
+     flex-direction: column;
+     flex-grow: 1; /* So that the content takes up available space */
+}
+
+.post-card-title {
+     font-size: var(--font-size-lg); /* 18px */
+     font-family: var(--font-secondary);
+     color: var(--color-headings);
+     margin-top: 0;
+     margin-bottom: var(--spacing-2);
+     line-height: 1.4;
+}
+
+.post-card-title a {
+     color: inherit;
+     text-decoration: none;
+}
+.post-card-title a:hover {
+     color: var(--color-primary);
+     text-decoration: none;
+}
+
+.post-card-excerpt {
+     font-size: var(--font-size-sm); /* 14px */
+     color: var(--color-text-secondary);
+     line-height: 1.6;
+     margin-bottom: var(--spacing-3);
+     flex-grow: 1; /* So that the text takes up space, pushing the button down */
+}
+
+.post-card .button { /* "Read More" button */
+     margin-top: auto; /* Pushes the button to the bottom of the card */
+     align-self: flex-start; /* Align button to the left */
+}
+
+/* Messages on the main page (No recent articles, DB connection unavailable) */
+.latest-posts .message.full-width-message {
+     grid-column: 1 / -1; /* Stretch the message across all grid columns */
+     background-color: var(--color-surface);
+     padding: var(--spacing-4);
+     border-radius: var(--border-radius-md);
+     border: 1px solid var(--color-border);
+}
+.latest-posts .message.full-width-message p {
+     margin-bottom: 0;
+     color: var(--color-text-muted);
+}
+
+
+/* View All Articles Button Container */
+.view-all-articles-container {
+     text-align: center;
+     margin-top: var(--spacing-4); /* Indent from the post grid */
+     padding-bottom: var(--spacing-2); /* Small indent at the bottom of the section */
+}
+.view-all-articles-container .button-secondary {
+     padding-left: var(--spacing-4);
+     padding-right: var(--spacing-4);
+}
+
+
+/* Call to Action Section */
+.call-to-action {
+     background-color: var(--color-primary); /* Accent background */
+     color: var(--color-primary-contrast); /* Light text on accent background */
+     text-align: center;
+}
+.call-to-action .section-title {
+     color: var(--color-primary-contrast); /* Title is also light */
+     margin-bottom: var(--spacing-3);
+}
+.call-to-action .section-title::after { /* Decorative element under the title */
+     background-color: var(--color-primary-contrast); /* Light for contrast */
+}
+
+.call-to-action p {
+     font-size: var(--font-size-md);
+     color: rgba(var(--color-primary-contrast-rgb), 0.9); /* Slightly less bright than the title */
+     margin-bottom: var(--spacing-4);
+     max-width: 600px;
+     margin-left: auto;
+     margin-right: auto;
+}
+
+.cta-actions {
+     display: flex;
+     justify-content: center;
+     gap: var(--spacing-3);
+     flex-wrap: wrap;
+}
+.cta-actions .button-primary { /* "Register" button */
+     background-color: var(--color-primary-contrast);
+     color: var(--color-primary); /* Button text in the main theme color */
+     border-color: var(--color-primary-contrast);
+}
+.cta-actions .button-primary:hover {
+     background-color: rgba(var(--color-primary-contrast-rgb), 0.9);
+     border-color: rgba(var(--color-primary-contrast-rgb), 0.9);
+     color: var(--color-primary-dark);
+}
+
+.cta-actions .button-secondary { /* "Login" button */
+     background-color: transparent;
+     color: var(--color-primary-contrast);
+     border-color: var(--color-primary-contrast);
+}
+.cta-actions .button-secondary:hover {
+     background-color: rgba(var(--color-primary-contrast-rgb), 0.15);
+     color: var(--color-primary-contrast);
+     border-color: var(--color-primary-contrast);
+}
+.cta-actions .button {
+     min-width: 160px;
+}
+

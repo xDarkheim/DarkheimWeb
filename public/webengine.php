@@ -150,7 +150,7 @@ require_once ROOT_PATH . DS . 'themes' . DS . SITE_THEME . DS . 'header.php';
                             default: $typeMessageClass = 'message--info';
                         }
                         $alertClass = trim("$baseMessageClass $typeMessageClass");
-                        echo "<div class=\"{$alertClass}\" role=\"alert\"><p>{$text}</p></div>";
+                        echo "<div class=\"{$alertClass}\" role=\"alert\"><p>{$text}</p><button type=\"button\" class=\"close-flash-message\" onclick=\"this.parentElement.style.display='none';\">&times;</button></div>";
                     }
                 }
             }
@@ -162,9 +162,7 @@ if (!empty($content_file) && file_exists($content_file)) {
     require_once $content_file;
 } else {
     error_log("Error: Content file not found or invalid for page key '{$page_key}'. Expected at: {$content_file}");
-    // Ensure $page_title is set for the 404 page
     $page_title = "Page Not Found";
-    // Recalculate the HTML title if it changed
     if ($page_title && $page_title !== ($site_settings_from_db['site_name'] ?? 'WebEngine Darkheim')) {
         $template_data['html_page_title'] = htmlspecialchars($page_title) . " | " . htmlspecialchars($site_settings_from_db['site_name'] ?? 'WebEngine Darkheim');
         $template_data['page_main_heading'] = htmlspecialchars($page_title);
@@ -172,8 +170,6 @@ if (!empty($content_file) && file_exists($content_file)) {
         $template_data['html_page_title'] = htmlspecialchars($site_settings_from_db['site_name'] ?? 'WebEngine Darkheim');
         $template_data['page_main_heading'] = htmlspecialchars($site_settings_from_db['site_name'] ?? 'WebEngine Darkheim');
     }
-    // Update variables after extract, if they are used directly in header.php before this point
-    // This might not be necessary if header.php only uses $template_data
     $html_page_title = $template_data['html_page_title'];
     $page_main_heading = $template_data['page_main_heading'];
 

@@ -1,0 +1,29 @@
+/* Layout: Site Wrapper (for Sidebar and Main Content) */
+.site-wrapper {
+    display: flex;
+    flex-grow: 1; /* Allows footer to stick to bottom */
+    max-width: 1200px; /* Consistent max-width */
+    margin: var(--spacing-4) auto; /* Centering and top/bottom margin */
+    gap: var(--spacing-4); /* Space between sidebar and main content */
+    padding: 0 var(--spacing-4); /* Padding for smaller screens */
+}
+
+/* Layout: Sidebar */
+.sidebar {
+    width: 300px; /* Fixed width for sidebar */
+    flex-shrink: 0; /* Prevent sidebar from shrinking */
+    padding: 20px;
+}
+
+.sidebar > div { /* Spacing between widgets in sidebar */
+    margin-bottom: var(--spacing-4);
+}
+
+/* Layout: Main Content */
+.main-content {
+    flex-grow: 1;
+    background-color: var(--color-surface);
+    padding: var(--spacing-4); /* Internal padding for the panel */
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-md);
+}

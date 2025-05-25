@@ -1,0 +1,156 @@
+/* Styles for Management Pages (Tables, Admin Lists) */
+
+/* .page-container and .page-header are in layout/_page.css */
+
+.manage-articles-page .page-header,
+.manage-users-page .page-header, /* For future manage_users.php */
+.edit-user-page .page-header { /* For edit_user.php */
+    /* Specific adjustments if needed */
+}
+
+.table-responsive {
+    overflow-x: auto;
+    background-color: var(--color-surface);
+    padding: var(--spacing-3);
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-sm);
+}
+
+.styled-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: var(--font-size-sm);
+}
+
+.styled-table th,
+.styled-table td {
+    padding: var(--spacing-2) var(--spacing-3);
+    text-align: left;
+    border-bottom: 1px solid var(--color-border-light);
+}
+
+.styled-table thead th {
+    background-color: var(--color-surface-accent);
+    color: var(--color-headings);
+    font-weight: var(--font-weight-semibold);
+    border-bottom-width: 2px;
+    border-bottom-color: var(--color-border);
+}
+
+.styled-table tbody tr:hover {
+    background-color: var(--color-surface-hover);
+}
+
+.styled-table .actions-column,
+.styled-table .actions-cell {
+    text-align: right;
+    white-space: nowrap;
+}
+.styled-table .actions-cell .button,
+.styled-table .actions-cell form {
+    margin-left: var(--spacing-1);
+    display: inline-block; /* Ensure forms and buttons align well */
+}
+.styled-table .actions-cell .button-small {
+    padding: var(--spacing-1) var(--spacing-2);
+    font-size: var(--font-size-xs);
+}
+
+
+.styled-table .categories-cell .category-tag-small {
+    font-size: var(--font-size-xs);
+    padding: 2px 6px;
+    border-radius: var(--border-radius-sm);
+    background-color: var(--color-secondary);
+    color: var(--color-white);
+    text-decoration: none;
+    margin-right: 4px;
+    margin-bottom: 4px;
+    display: inline-block;
+    text-indent: 0 !important; /* Override any global text-indent */
+}
+.styled-table .categories-cell .category-tag-small:hover {
+    background-color: var(--color-secondary-dark);
+}
+.styled-table .categories-cell .text-muted-small {
+    font-size: var(--font-size-xs);
+    color: var(--color-text-muted);
+}
+
+
+/* Pagination */
+.pagination {
+    margin-top: var(--spacing-4);
+    display: flex;
+    justify-content: center;
+}
+.pagination-list {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    gap: var(--spacing-1);
+}
+.pagination-link {
+    display: inline-block;
+    padding: var(--spacing-1_5) var(--spacing-2_5);
+    text-decoration: none;
+    color: var(--color-primary);
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius-md);
+    transition: background-color 0.2s, color 0.2s;
+}
+.pagination-link:hover {
+    background-color: var(--color-primary-light);
+    color: var(--color-white);
+    border-color: var(--color-primary-light);
+}
+.pagination-link.is-active {
+    background-color: var(--color-primary);
+    color: var(--color-white);
+    border-color: var(--color-primary);
+    font-weight: var(--font-weight-semibold);
+}
+
+/* For edit_user.php form styling */
+.edit-user-page .admin-content-container {
+    background-color: var(--color-surface);
+    padding: var(--spacing-4);
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-sm);
+    max-width: 700px; /* Or adjust as needed */
+    margin: 0 auto; /* Center the form container */
+}
+
+.edit-user-page .styled-form .form-group {
+    margin-bottom: var(--spacing-3);
+}
+.edit-user-page .styled-form .form-label {
+    display: block;
+    margin-bottom: var(--spacing-1);
+    font-weight: var(--font-weight-medium);
+}
+.edit-user-page .styled-form .form-control {
+    /* Uses global .form-control styles */
+}
+.edit-user-page .styled-form .form-actions {
+    margin-top: var(--spacing-4);
+    display: flex;
+    gap: var(--spacing-2);
+}
+.edit-user-page .styled-form .form-actions .button i {
+    margin-right: var(--spacing-1);
+}
+
+/* Empty state message on manage pages */
+.message--empty-state {
+    text-align: center;
+    padding: var(--spacing-5);
+    background-color: var(--color-surface);
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-sm);
+}
+.message--empty-state p {
+    font-size: var(--font-size-lg);
+    margin-bottom: var(--spacing-3);
+}

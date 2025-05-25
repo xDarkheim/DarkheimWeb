@@ -31,23 +31,23 @@ if (empty($token)) {
 
 $user = User::findByPendingEmailChangeToken($database_handler, $token);
 
-// --- ОТЛАДКА ---
+// --- DEBUG ---
 if ($user) {
     error_log("User Object in verify_email_change.php: " . print_r($user, true));
     error_log("Value from getPendingEmailAddress(): " . $user->getPendingEmailAddress());
 } else {
     error_log("User not found by token in verify_email_change.php");
 }
-// --- КОНЕЦ ОТЛАДКИ ---
+// --- END DEBUG ---
 
-if ($user) { // Пользователь по токену найден
+if ($user) { // User found by token
     // Check if token has expired (already handled in findByPendingEmailChangeToken, but double check)
     if ($user->getPendingEmailTokenExpiresAt() && strtotime($user->getPendingEmailTokenExpiresAt()) < time()) {
         $flashMessageService->addError("This email change confirmation link has expired. Please request the change again.");
         // Optionally, clear the expired token from DB
         $user->clearPendingEmailChange();
         $user->savePendingEmailChange(); // Save the cleared state
-    } elseif ($user->getPendingEmailAddress()) { // Есть ожидающий email
+    } elseif ($user->getPendingEmailAddress()) { // Pending email exists
         $oldEmail = $user->getEmail(); // For logging or notification
         $newEmail = $user->getPendingEmailAddress();
 
@@ -63,10 +63,10 @@ if ($user) { // Пользователь по токену найден
             $flashMessageService->addError("Failed to update your email address. Please try again or contact support.");
             error_log("Failed to confirm email change for token: " . htmlspecialchars($token) . " User ID: " . $user->getId());
         }
-    } else { // Пользователь найден, токен не просрочен, НО НЕТ ОЖИДАЮЩЕГО EMAIL
+    } else { // User found, token not expired, BUT NO PENDING EMAIL
         $flashMessageService->addError("Invalid email change request. No pending email found.");
     }
-} else { // Пользователь по токену НЕ найден (или токен недействителен/просрочен по логике findBy)
+} else { // User NOT found by token (or token invalid/expired by findBy logic)
     $flashMessageService->addError("Invalid or expired email change confirmation token.");
     error_log("Invalid or expired email change token used: " . htmlspecialchars($token));
 }

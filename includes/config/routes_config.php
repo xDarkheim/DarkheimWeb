@@ -24,6 +24,8 @@ return [
     'account_edit_profile' => ['file' => 'account/edit_profile.php', 'title' => 'Edit Profile', 'auth' => true],
     'account_settings' => ['file' => 'account/settings.php', 'title' => 'Account Settings', 'auth' => true],
     'site_settings' => ['file' => 'site_settings.php', 'title' => 'Site Settings', 'auth' => true, 'admin' => true],
+    'manage_categories' => ['file' => 'account/manage_categories.php', 'title' => 'Manage Categories', 'auth' => true, 'admin' => true],
+    'edit_category' => ['file' => 'account/edit_category.php', 'title' => 'Edit Category', 'auth' => true, 'admin' => true],
     'manage_users' => ['file' => 'account/manage_users.php', 'title' => 'Manage Users', 'auth' => true, 'admin' => true],
     'edit_user' => ['file' => 'account/edit_user.php', 'title' => 'Edit User', 'auth' => true, 'admin' => true],
     'verify_email_change' => ['file' => 'verify_email_change.php', 'title' => 'Verify Email Change', 'auth' => true, 'admin' => true],

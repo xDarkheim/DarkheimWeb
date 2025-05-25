@@ -141,53 +141,55 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 ?>
 
-<div class="auth-page-container auth-layout-split">
-    <div class="auth-layout-column auth-layout-column-info">
-    <h1 class="page-title auth-page-main-title">Forgot Your Password?</h1>
-    <div class="auth-info-content">
-        <p>No problem! Enter your email address below, and we'll send you a link to reset your password.</p>
-        <p>If you remember your password, you can <a href="/index.php?page=login">log in here</a>.</p>
-    </div>
-    </div>
+<div class="page-container-full-width"> <!-- Added for consistent full-width layout -->
+    <div class="auth-page-container auth-layout-split">
+        <div class="auth-layout-column auth-layout-column-info">
+        <h1 class="page-title auth-page-main-title">Forgot Your Password?</h1>
+        <div class="auth-info-content">
+            <p>No problem! Enter your email address below, and we'll send you a link to reset your password.</p>
+            <p>If you remember your password, you can <a href="/index.php?page=login">log in here</a>.</p>
+        </div>
+        </div>
 
-    <div class="auth-layout-column auth-layout-column-form">
-    <div class="auth-form-card">
-        <h2 class="auth-form-title">Reset Password</h2>
+        <div class="auth-layout-column auth-layout-column-form">
+        <div class="auth-form-card">
+            <h2 class="auth-form-title">Reset Password</h2>
 
-        <?php
-        
-        
-        ?>
+            <?php
+            
+            
+            ?>
 
-        <?php if ($email_sent_successfully): ?>
-            <div class="messages message-success">
-                <p>If an account with that email address exists, a password reset link has been sent. Please check your inbox (and spam folder).</p>
-            </div>
-            <p>Please check your email for the password reset link. If you don't see it, check your spam folder.</p>
-        <?php else: ?>
-            <form action="/index.php?page=forgot_password" method="POST" id="forgotPasswordForm">
-                <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($csrf_token); ?>">
-                
-                <div class="form-group">
-                    <label for="email" class="form-label">Your Email Address:</label>
-                    <div class="input-group">
-                        <span class="input-group-icon">✉️</span>
-                        <input type="email" name="email" id="email" class="form-control"
-                               placeholder="e.g., yourname@example.com" required
-                               value="<?php echo htmlspecialchars($_POST['email'] ?? ''); ?>">
+            <?php if ($email_sent_successfully): ?>
+                <div class="messages message-success">
+                    <p>If an account with that email address exists, a password reset link has been sent. Please check your inbox (and spam folder).</p>
+                </div>
+                <p>Please check your email for the password reset link. If you don't see it, check your spam folder.</p>
+            <?php else: ?>
+                <form action="/index.php?page=forgot_password" method="POST" id="forgotPasswordForm">
+                    <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($csrf_token); ?>">
+                    
+                    <div class="form-group">
+                        <label for="email" class="form-label">Your Email Address:</label>
+                        <div class="input-group">
+                            <span class="input-group-icon">✉️</span>
+                            <input type="email" name="email" id="email" class="form-control"
+                                   placeholder="e.g., yourname@example.com" required
+                                   value="<?php echo htmlspecialchars($_POST['email'] ?? ''); ?>">
+                        </div>
                     </div>
-                </div>
-                
-                <div class="form-actions">
-                    <button type="submit" class="button button-primary button-block">Send Reset Link</button>
-                </div>
-            </form>
-        <?php endif; ?>
+                    
+                    <div class="form-actions">
+                        <button type="submit" class="button button-primary button-block">Send Reset Link</button>
+                    </div>
+                </form>
+            <?php endif; ?>
 
-        <div class="auth-form-footer">
-            <p>Remembered your password? <a href="/index.php?page=login">Sign In</a></p>
-            <p>Don't have an account? <a href="/index.php?page=register">Create one</a></p>
+            <div class="auth-form-footer">
+                <p>Remembered your password? <a href="/index.php?page=login">Sign In</a></p>
+                <p>Don't have an account? <a href="/index.php?page=register">Create one</a></p>
+            </div>
         </div>
     </div>
-</div>
+    </div>
 </div>

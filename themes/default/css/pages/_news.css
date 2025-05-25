@@ -1,0 +1,314 @@
+/* ==========================================================================
+   Общие стили для страницы новостей (news.php)
+   ========================================================================== */
+.news-page-container {
+    min-width: 800px; /* Минимальная ширина для страницы новостей */
+    width: 100%;
+}
+
+/* ==========================================================================
+   Single Article Page (Страница отдельной новости)
+   ========================================================================== */
+
+/* .single-article уже существует, убедимся, что он хорошо вписывается в .news-page-container */
+
+.single-article-header {
+    margin-bottom: var(--spacing-4); /* Отступ после заголовка и меты */
+    padding-bottom: var(--spacing-4); /* Отступ до контента */
+    border-bottom: 1px solid var(--color-border-extralight); /* Тонкий разделитель */
+}
+
+.single-article-title { /* Обычно H1 */
+    font-size: var(--font-size-xxxl, 2.5rem); /* Крупный, выразительный заголовок */
+    font-family: var(--font-secondary);
+    color: var(--color-headings);
+    margin-bottom: var(--spacing-3); /* Отступ до мета-информации */
+    line-height: 1.2;
+    letter-spacing: -0.03em; /* Немного сжатое межбуквенное расстояние */
+}
+
+/* .article-meta уже стилизован глобально, проверим его вид здесь */
+.single-article .article-meta {
+    margin-bottom: 0; /* Убираем нижний отступ, так как .single-article-header имеет свой padding-bottom */
+    /* Стили для .category-tag в .article-meta уже должны быть хорошими */
+}
+
+.article-content {
+    font-size: var(--font-size-md, 1rem); /* Базовый размер для основного текста */
+    line-height: 1.8; /* Улучшенная читаемость для длинных текстов */
+    color: var(--color-text);
+    padding-top: var(--spacing-2); /* Небольшой отступ сверху, если нужно отделить от разделителя */
+}
+
+.article-content p {
+    margin-bottom: var(--spacing-3);
+}
+
+.article-content img {
+    max-width: 100%;
+    height: auto;
+    border-radius: var(--border-radius-lg); /* Скругление для изображений */
+    margin-top: var(--spacing-4);
+    margin-bottom: var(--spacing-4);
+    box-shadow: var(--shadow-lg); /* Более выраженная тень для изображений в статье */
+    border: 1px solid var(--color-border); /* Тонкая рамка */
+}
+
+.article-content a {
+    color: var(--color-primary-light);
+    text-decoration: none; /* Убираем подчеркивание по умолчанию */
+    border-bottom: 1px dashed var(--color-primary-light); /* Пунктирное подчеркивание */
+    transition: color var(--transition-duration) ease, border-color var(--transition-duration) ease;
+}
+.article-content a:hover {
+    color: var(--color-primary);
+    border-bottom-color: var(--color-primary);
+    text-decoration: none; /* Убираем стандартное подчеркивание при наведении */
+}
+
+.article-content h2, .article-content h3, .article-content h4, .article-content h5, .article-content h6 {
+    margin-top: var(--spacing-5);
+    margin-bottom: var(--spacing-2);
+    color: var(--color-headings);
+    font-family: var(--font-secondary);
+    line-height: 1.3;
+}
+/* Размеры уже определены глобально, но можно переопределить при необходимости */
+/* .article-content h2 { font-size: var(--font-size-xxl); } */
+/* .article-content h3 { font-size: var(--font-size-xl); } */
+
+.article-content ul, .article-content ol {
+    padding-left: var(--spacing-4);
+    margin-bottom: var(--spacing-3);
+}
+.article-content li {
+    margin-bottom: var(--spacing-2);
+}
+
+.article-content blockquote {
+    margin: var(--spacing-4) 0;
+    padding: var(--spacing-3) var(--spacing-4);
+    background-color: var(--color-surface-accent);
+    border-left: 4px solid var(--color-primary);
+    color: var(--color-text-muted);
+    font-style: italic;
+    border-radius: 0 var(--border-radius-md) var(--border-radius-md) 0;
+}
+.article-content blockquote p:last-child {
+    margin-bottom: 0;
+}
+
+.article-content pre, .article-content code {
+    font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, Courier, monospace; /* Типичный моноширинный шрифт */
+    background-color: var(--color-surface-code, var(--color-background)); /* Фон для блоков кода */
+    color: var(--color-text);
+    border-radius: var(--border-radius-md);
+    border: 1px solid var(--color-border);
+    font-size: 0.9em;
+}
+.article-content pre {
+    padding: var(--spacing-3);
+    overflow-x: auto; /* Горизонтальная прокрутка для длинных строк кода */
+    margin-bottom: var(--spacing-3);
+    box-shadow: var(--shadow-inner);
+}
+.article-content code:not(pre code) { /* Для инлайн-кода */
+    padding: 0.2em 0.4em;
+    margin: 0 0.1em;
+    white-space: nowrap;
+}
+
+
+.article-admin-actions {
+    margin-top: var(--spacing-5);
+    padding: var(--spacing-4); /* Увеличим отступы */
+    background-color: var(--color-surface-accent);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius-lg); /* Большее скругление */
+    box-shadow: var(--shadow-md);
+}
+.article-admin-actions h4 { /* Заголовок "Admin Actions" */
+    margin-top: 0;
+    margin-bottom: var(--spacing-3);
+    color: var(--color-headings);
+    font-size: var(--font-size-lg);
+    font-family: var(--font-secondary);
+}
+.article-admin-actions .button {
+    margin-right: var(--spacing-2);
+    margin-bottom: var(--spacing-2); /* Для случая переноса кнопок */
+}
+.article-admin-actions form {
+    margin-right: var(--spacing-2);
+    display: inline-block; /* Чтобы формы были в строку с кнопками */
+}
+
+
+/* ==========================================================================
+   Category Filter on News Feed Page (Фильтр категорий)
+   ========================================================================== */
+.category-filter-section {
+    margin-bottom: var(--spacing-5);
+    padding: var(--spacing-4); /* Увеличим отступы */
+    background-color: var(--color-surface-accent);
+    border-radius: var(--border-radius-lg);
+    border: 1px solid var(--color-border);
+    box-shadow: var(--shadow-md);
+}
+
+.category-filter-title {
+    font-size: var(--font-size-xl); /* Крупнее заголовок */
+    color: var(--color-headings);
+    font-family: var(--font-secondary);
+    margin-top: 0;
+    margin-bottom: var(--spacing-3);
+}
+
+.category-filter-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-2);
+}
+
+.category-filter-list .category-link {
+    display: inline-block;
+    padding: var(--spacing-1) var(--spacing-3);
+    color: var(--color-primary-light);
+    background-color: var(--color-surface); /* Фон для тега */
+    border: 1px solid var(--color-border); /* Граница для тега */
+    border-radius: var(--border-radius-pill); /* Овальная форма */
+    text-decoration: none;
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+    transition: background-color var(--transition-duration) ease, color var(--transition-duration) ease, border-color var(--transition-duration) ease, transform var(--transition-duration) ease;
+}
+
+.category-filter-list .category-link:hover {
+    background-color: var(--color-primary);
+    color: var(--color-primary-contrast);
+    border-color: var(--color-primary-dark);
+    transform: translateY(-2px); /* Небольшой подъем при наведении */
+    box-shadow: var(--shadow-sm);
+}
+.category-filter-list .category-link.is-active { /* Для активного фильтра */
+    background-color: var(--color-primary-dark);
+    color: var(--color-primary-contrast);
+    border-color: var(--color-primary-dark);
+    font-weight: var(--font-weight-bold);
+}
+
+
+/* ==========================================================================
+   News Feed / Article List (Лента новостей - карточки)
+   ========================================================================== */
+.news-feed-container {
+    display: flex; /* Изменено с grid */
+    flex-direction: column; /* Элементы будут располагаться вертикально */
+    /* grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr)); */ /* Удалено или закомментировано */
+    gap: var(--spacing-4); /* Отступ между элементами ленты */
+    margin-top: var(--spacing-4);
+    /* align-items: center; */ /* Раскомментируйте, если хотите центрировать .news-feed-item при использовании max-width для него */
+}
+
+.news-feed-item { /* Карточка новости */
+    /* width: 800px; */ /* Удалена или закомментирована фиксированная ширина */
+    width: 100%; /* Элемент новости будет занимать всю ширину контейнера */
+    /* max-width: 800px; */ /* Опционально: установите максимальную ширину для удобочитаемости на широких экранах. */
+                               /* Если используется max-width, раскомментируйте align-items: center; в .news-feed-container */
+                               /* и добавьте margin-left: auto; margin-right: auto; сюда, если align-items не используется. */
+    background-color: var(--color-surface-accent);
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-md);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transition: transform var(--transition-duration) ease, box-shadow var(--transition-duration) ease;
+    border: 1px solid var(--color-border);
+}
+
+.news-feed-item:hover {
+    transform: translateY(-6px); /* Более заметный подъем */
+    box-shadow: var(--shadow-lg); /* Более выраженная тень */
+}
+
+.news-feed-item-image { /* Изображение-превью для новости */
+    width: 100%;
+    height: 200px; /* Фиксированная высота для единообразия */
+    object-fit: cover; /* Масштабирование с обрезкой */
+    border-bottom: 1px solid var(--color-border-extralight); /* Тонкий разделитель */
+    filter: grayscale(30%) contrast(110%); /* Небольшой эффект для изображений */
+    transition: filter var(--transition-duration-long) ease;
+}
+.news-feed-item:hover .news-feed-item-image {
+    filter: grayscale(0%) contrast(100%);
+}
+
+.news-feed-item-content-wrapper { /* Обертка для текстового контента и кнопки */
+    padding: var(--spacing-3) var(--spacing-4); /* Увеличим горизонтальный паддинг */
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    width: 100%;
+}
+
+.news-feed-item-title {
+    font-size: var(--font-size-xl);
+    font-family: var(--font-secondary);
+    color: var(--color-headings);
+    margin-top: 0;
+    margin-bottom: var(--spacing-2); /* Увеличим отступ */
+    line-height: 1.3;
+}
+
+.news-feed-item-title a {
+    color: inherit;
+    text-decoration: none;
+}
+.news-feed-item-title a:hover {
+    color: var(--color-primary);
+    text-decoration: none;
+}
+
+.news-feed-item .article-meta {
+    font-size: var(--font-size-xs);
+    color: var(--color-text-muted);
+    margin-bottom: var(--spacing-3); /* Увеличим отступ */
+    line-height: 1.5;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-1) var(--spacing-2); /* row-gap column-gap */
+}
+.news-feed-item .article-meta .author-name {
+    color: var(--color-text);
+    font-weight: var(--font-weight-medium);
+}
+.news-feed-item .article-categories-display .category-tag {
+    font-size: 0.85em; /* Чуть меньше */
+    padding: var(--spacing-0) var(--spacing-1);
+    background-color: var(--color-surface);
+    border-color: var(--color-border);
+    color: var(--color-primary-light);
+}
+.news-feed-item .article-categories-display .category-tag:hover {
+    background-color: var(--color-primary-ultralight);
+    border-color: var(--color-primary-lighter);
+    color: var(--color-primary);
+}
+
+.news-feed-item-content { /* Краткое описание */
+    font-size: var(--font-size-sm);
+    color: var(--color-text-secondary);
+    line-height: 1.7; /* Улучшим читаемость */
+    margin-bottom: var(--spacing-3);
+    flex-grow: 1; /* Растягивает текст, отодвигая кнопку вниз */
+}
+
+.news-feed-item .read-more-link.button {
+    margin-top: auto; /* Прижимает кнопку к низу */
+    align-self: flex-start;
+    /* Стили .button-outline и .button-small уже должны быть применены */
+    /* Можно добавить иконку, если есть система иконок */
+}

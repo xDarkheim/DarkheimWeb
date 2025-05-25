@@ -1,0 +1,19 @@
+/* Base styles */
+*, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    border-width: 0; /* Reset borders for a more graphic control */
+    border-style: solid;
+    border-color: var(--color-border); /* Default border color */
+}
+
+html {
+    font-size: 16px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    scroll-behavior: smooth;
+    background-color: var(--color-background); /* Apply to html for full page bg */
+    color: var(--color-text); /* Default text color */
+}

@@ -62,7 +62,26 @@ WebEngine Darkheim is a web application focused on providing a resource hub for 
 ├── themes/             # Site themes
 │   └── default/        # Default theme (CSS, potentially JS, images)
 │       └── css/
-│           └── style.css
+│           ├── base/
+│           ├── components/
+│           ├── layout/
+│           │   ├── _footer.css
+│           │   ├── _grid.css
+│           │   ├── _header.css
+│           │   ├── _navigation.css
+│           │   ├── _page.css      # Added
+│           │   └── _sidebar.css
+│           ├── pages/
+│           │   ├── _about.css     # Added
+│           │   ├── _auth.css
+│           │   ├── _comments.css
+│           │   ├── _dashboard.css
+│           │   ├── _home.css      # Added
+│           │   ├── _manage.css    # Added
+│           │   ├── _news.css
+│           │   └── _profile.css
+│           ├── utils/
+│           └── main.css           # Main CSS file that imports others (or style.css)
 ├── vendor/             # Composer dependencies (e.g., PHPMailer) - Should be installed via Composer
 ├── .htaccess           # Apache server configuration
 ├── .gitignore          # Specifies intentionally untracked files that Git should ignore

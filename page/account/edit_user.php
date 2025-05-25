@@ -138,10 +138,12 @@ if (empty($csrf_token) && function_exists('random_bytes')) {
 
 <div class="page-container edit-user-page">
     <header class="page-header">
-        <h1><?php echo htmlspecialchars($page_title); ?>: <?php echo htmlspecialchars($user_to_edit['username'] ?? 'N/A'); ?></h1>
-        <a href="/index.php?page=manage_users" class="button button-secondary page-header-action">
-            <i class="fas fa-arrow-left"></i> Back to User List
-        </a>
+        <h1 class="page-title"><?php echo htmlspecialchars($page_title); ?>: <?php echo htmlspecialchars($user_to_edit['username'] ?? 'N/A'); ?></h1>
+        <div class="page-header-actions">
+            <a href="/index.php?page=manage_users" class="button button-secondary">
+                <i class="fas fa-arrow-left"></i> Back to User List
+            </a>
+        </div>
     </header>
 
     <?php

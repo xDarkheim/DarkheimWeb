@@ -1,0 +1,135 @@
+/* Container for authentication pages */
+.auth-page-container {
+    width: 100%;
+    max-width: 1100px; /* Overall maximum page width */
+    margin: var(--spacing-4) auto; /* Centering and vertical margins */
+    padding: var(--spacing-4);
+    box-sizing: border-box;
+}
+
+/* New layout with two columns */
+.auth-layout-split {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    gap: var(--spacing-5); /* Space between columns */
+    align-items: flex-start; /* Align to the top if columns have different heights */
+}
+
+.auth-layout-column {
+    flex-grow: 1;
+}
+
+.auth-layout-column-form {
+    flex-basis: 450px; /* Fixed or percentage width for the form */
+    max-width: 450px; /* Limit form width */
+}
+
+.auth-layout-column-info {
+    flex-basis: 40%; /* Remaining space or specific value */
+    padding-top: var(--spacing-3); /* Small top padding to align with the form */
+}
+
+/* Card/panel for the authentication form */
+.auth-form-card {
+    background-color: var(--color-surface);
+    padding: var(--spacing-5);
+    border-radius: var(--border-radius-xl);
+    width: 100%; /* Occupies full width of its column */
+    max-width: 450px;
+    margin-left: auto; /* Center the card horizontally */
+    margin-right: auto; /* Center the card horizontally */
+}
+
+/* Page title in the info column */
+.auth-layout-column-info .page-title,
+.auth-layout-column-info .auth-page-main-title { /* Adding specificity */
+    text-align: left; /* Align to the left for the info column */
+    margin-top: 0;
+    margin-bottom: var(--spacing-4); /* Space below the title */
+}
+
+/* Warning Message in the info column */
+.auth-layout-column-info .auth-warning-message {
+    max-width: 100%; /* Occupies full width of the info column */
+    margin-left: 0; /* Remove auto margin as the column is already positioned */
+    margin-right: 0;
+}
+
+/* Title inside the form card */
+.auth-form-title {
+    font-size: 1.8rem; /* Title size */
+    color: var(--color-headings);
+    text-align: center;
+    margin-top: 0; /* Remove default h2 margin */
+    margin-bottom: var(--spacing-4); /* Space below the title */
+}
+
+/* Messages inside the form card */
+.auth-form-card .messages {
+    margin-left: calc(-1 * var(--spacing-5)); /* Align to card edges if .messages has its own margins */
+    margin-right: calc(-1 * var(--spacing-5));
+    margin-bottom: var(--spacing-3);
+    border-radius: 0; /* Remove radius for messages inside the card */
+    border-left: none;
+    border-right: none;
+    box-shadow: none; /* Remove shadow for messages as the card has shadow */
+}
+.auth-form-card .messages.errors,
+.auth-form-card .messages.success {
+    border-top-left-radius: var(--border-radius-xl); /* Preserve card radius at the top if the message is first */
+    border-top-right-radius: var(--border-radius-xl);
+}
+
+/* Fields inside the form card */
+.auth-form-card .form-group {
+    margin-bottom: var(--spacing-3); /* Space between field groups */
+}
+.auth-form-card .form-label {
+    font-size: 0.9rem;
+}
+
+/* Submit button */
+.auth-form-card .form-actions {
+    margin-top: var(--spacing-4);
+}
+.auth-form-card .button-block {
+    font-size: 1rem; /* Slightly larger button */
+}
+
+/* Footer of the form with a link to login */
+.auth-form-footer {
+    margin-top: var(--spacing-4);
+    text-align: center;
+    font-size: 0.9rem;
+}
+.auth-form-footer p {
+    color: var(--color-text-muted);
+    margin-bottom: 0;
+}
+.auth-form-footer a {
+    color: var(--color-primary-light);
+    text-decoration: none;
+    font-weight: 500;
+}
+.auth-form-footer a:hover {
+    color: var(--color-primary);
+    text-decoration: underline;
+}
+
+
+/* ==========================================================================
+   Authentication Pages
+   ========================================================================== */
+.auth-form-panel {
+    max-width: 720px;
+    margin: 0 auto;
+}
+
+.auth-page-main-title.page-title,
+.auth-page-container > .page-title {
+    text-align: center;
+    margin-top: 0;
+    margin-bottom: var(--spacing-3);
+    width: 100%;
+    display: block;
+}

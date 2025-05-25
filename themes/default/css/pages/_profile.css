@@ -1,0 +1,257 @@
+/* Styles for Account Settings, Edit Profile, Create Article, Edit Article, and Site Settings Pages */
+
+/* Main page container for forms */
+.account-settings-container, /* Used by edit_profile.php, account/settings.php */
+.create-article-page, 
+.edit-article-page,
+.site-settings-page { /* Added for site_settings.php */
+    max-width: 800px;
+    margin: var(--spacing-4) auto;
+    padding: var(--spacing-4);
+    background-color: var(--color-surface);
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-md);
+}
+
+.account-settings-container h1,
+.create-article-page h1, 
+.edit-article-page h1,
+.site-settings-page h1 { /* Added */
+    min-width: 800px; /* Ensure consistent width for headings */
+    font-size: var(--font-size-xxl);
+    color: var(--color-headings);
+    margin-top: 0;
+    margin-bottom: var(--spacing-4);
+    padding-bottom: var(--spacing-3);
+    border-bottom: 1px solid var(--color-border-extralight);
+    text-align: left;
+}
+
+/* Back link styling */
+.form-page-back-link {
+    display: inline-block;
+    margin-bottom: var(--spacing-3);
+}
+
+.settings-section {
+    margin-bottom: var(--spacing-5);
+    padding-bottom: var(--spacing-4);
+    border-bottom: 1px solid var(--color-border-extralight);
+}
+.settings-section:last-of-type {
+    margin-bottom: 0;
+    padding-bottom: 0;
+    border-bottom: none;
+}
+
+.settings-section h2 {
+    font-size: var(--font-size-xl);
+    color: var(--color-headings);
+    margin-top: 0;
+    margin-bottom: var(--spacing-3);
+    font-family: var(--font-secondary);
+}
+
+.settings-form .setting-item {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-2) var(--spacing-3); /* row-gap column-gap */
+    margin-bottom: var(--spacing-3);
+    align-items: flex-start; /* Align items to the start for multi-line labels */
+}
+
+.settings-form .setting-label,
+.settings-form .form-group > label { /* Added for site_settings.php structure */
+    flex-basis: 200px; /* Adjust width of label column */
+    flex-grow: 1;
+    padding-top: calc(var(--input-padding-y) / 2); /* Align with input text if single line */
+}
+.settings-form .setting-label label {
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-text);
+    margin-bottom: var(--spacing-0);
+    display: block;
+}
+.settings-form .setting-label .setting-description {
+    font-size: var(--font-size-xs);
+    color: var(--color-text-muted);
+    display: block;
+    line-height: 1.4;
+}
+
+.settings-form .setting-control,
+.settings-form .form-group > input, /* Added for site_settings.php structure */
+.settings-form .form-group > textarea, /* Added for site_settings.php structure */
+.settings-form .form-group > select { /* Added for site_settings.php structure */
+    flex-basis: 300px; /* Minimum width for control */
+    flex-grow: 2; /* Allow control to take more space */
+}
+
+.settings-form .form-control[disabled] {
+    background-color: var(--color-surface-accent);
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+.settings-form textarea.form-control {
+    min-height: 80px;
+}
+
+.settings-form .setting-actions,
+.account-settings-container .page-actions {
+    margin-top: var(--spacing-4);
+    display: flex;
+    justify-content: flex-start; /* Align buttons to the left */
+    gap: var(--spacing-2);
+}
+.account-settings-container .page-actions {
+    padding-top: var(--spacing-3);
+    border-top: 1px solid var(--color-border-extralight);
+}
+
+
+/* Specific to edit_profile.php if needed, or can be general */
+.profile-details-section .setting-item,
+.password-change-section .setting-item {
+    /* any specific overrides if layout differs from generic settings */
+}
+
+/* Messages styling within this container */
+.account-settings-container .messages,
+.create-article-page .messages, 
+.edit-article-page .messages,
+.site-settings-page .messages { /* Added */
+    /* Using styles from components/_messages.css for .form-page-container .messages */
+    /* Add any overrides if needed */
+    margin-bottom: var(--spacing-4);
+}
+
+/* Field-specific error messages */
+.styled-form .form-group .error-message {
+    color: var(--color-danger);
+    font-size: var(--font-size-sm);
+    margin-top: var(--spacing-1);
+    display: block;
+}
+.styled-form .form-group.has-error .form-control {
+    border-color: var(--color-danger);
+}
+.styled-form .form-group.has-error .form-label {
+    color: var(--color-danger);
+}
+
+
+/* Placeholder form styles from settings.php, if they are to be styled similarly */
+.placeholder-form .form-group {
+    margin-bottom: var(--spacing-3);
+}
+.placeholder-form .form-group label,
+.site-settings-page .form-group label { /* Added */
+    font-weight: var(--font-weight-medium);
+    display: block; /* Ensure label takes full width in its column if not flexed */
+    margin-bottom: var(--spacing-1);
+}
+.placeholder-form .form-group .form-control[disabled],
+.site-settings-page .form-group .form-control[disabled] { /* Added */
+    opacity: 0.6;
+}
+.placeholder-form .form-actions button[disabled],
+.site-settings-page .form-actions button[disabled] { /* Added */
+    opacity: 0.6;
+}
+
+.site-settings-page .form-group { /* Specific for site_settings.php if its structure is simpler */
+    display: block; /* Override flex if label is on top */
+    margin-bottom: var(--spacing-3);
+}
+.site-settings-page .form-group input[type="text"],
+.site-settings-page .form-group input[type="email"],
+.site-settings-page .form-group textarea {
+    width: 100%; /* Make inputs full width within their container */
+}
+.site-settings-page .form-actions {
+    margin-top: var(--spacing-4);
+}
+
+
+hr.section-divider { /* Style for <hr> in settings.php */
+    border: 0;
+    border-top: 1px solid var(--color-border);
+    margin: var(--spacing-5) 0;
+}
+
+/* Styles for Category Selection in Article Forms */
+.category-checkbox-group {
+    column-count: 2;
+    column-gap: var(--spacing-1_5); /* Further reduced column gap */
+    padding: var(--spacing-1); /* Further reduced padding */
+    border: 1px solid var(--color-border-extralight); /* Lighter border */
+    border-radius: var(--border-radius-sm); /* Smaller border radius */
+    background-color: transparent; /* Make background transparent */
+    max-height: 120px; /* Further reduced max height */
+    overflow-y: auto;
+}
+
+.category-checkbox-group .checkbox-item {
+    display: block;
+    margin-bottom: var(--spacing-0_5); /* Further reduced margin */
+    padding: var(--spacing-0_5); /* Further reduced padding */
+    border-radius: var(--border-radius-xs); /* Smaller radius for items */
+    transition: background-color 0.2s ease;
+    -webkit-column-break-inside: avoid;
+    page-break-inside: avoid;
+    break-inside: avoid;
+}
+
+.category-checkbox-group .checkbox-item:hover {
+    background-color: var(--color-surface-hover);
+}
+
+.category-checkbox-group .checkbox-item input[type="checkbox"] {
+    margin-right: var(--spacing-1); 
+    vertical-align: middle;
+    transform: scale(0.9); /* Slightly scale down checkbox */
+}
+
+.category-checkbox-group .checkbox-item label {
+    font-weight: var(--font-weight-normal);
+    font-size: var(--font-size-sm); /* Reduced font size for category labels */
+    vertical-align: middle;
+    cursor: pointer;
+    color: var(--color-text-muted); /* Make label text a bit muted */
+}
+
+.category-checkbox-group .checkbox-item input[type="checkbox"]:checked + label {
+    color: var(--color-text); /* Make selected label text normal color */
+    font-weight: var(--font-weight-medium);
+}
+
+.no-categories-message {
+    font-style: italic;
+    color: var(--color-text-muted);
+    padding: var(--spacing-2);
+}
+
+
+/* Responsive adjustments for category columns */
+@media (min-width: 768px) {
+    .category-checkbox-group {
+        column-count: 3; /* Use 3 columns on wider screens */
+    }
+}
+
+@media (max-width: 480px) {
+    .category-checkbox-group {
+        column-count: 1; /* Use 1 column on very small screens */
+        max-height: 150px; /* Adjusted max height for single column */
+    }
+}
+
+/* End Styles for Category Selection */
+
+.styled-form .form-actions,
+.settings-form .form-actions { /* Added for site_settings.php structure */
+    margin-top: var(--spacing-4);
+    display: flex;
+    justify-content: flex-start; /* Align buttons to the left */
+    gap: var(--spacing-2);
+}

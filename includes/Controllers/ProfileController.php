@@ -17,7 +17,7 @@ class ProfileController {
         $this->db_handler = $db_handler;
         $this->userId = $userId;
         $this->flashService = $flashService;
-        // $this->mailerService = $mailerService; // Добавьте это
+        // $this->mailerService = $mailerService; // Add this
     }
 
     private function loadUser(): ?User {
@@ -54,7 +54,7 @@ class ProfileController {
             return;
         }
 
-        // 1. Валидация (пустые поля, совпадение нового пароля и подтверждения, сложность пароля)
+        // 1. Validation (empty fields, new password and confirmation match, password complexity)
         if (empty($currentPassword) || empty($newPassword) || empty($confirmPassword)) {
             $this->flashService->addError("All password fields are required.");
             return;
@@ -63,51 +63,51 @@ class ProfileController {
             $this->flashService->addError("New password and confirmation password do not match.");
             return;
         }
-        if (strlen($newPassword) < 8) { // Пример минимальной длины
+        if (strlen($newPassword) < 8) { // Example minimum length
             $this->flashService->addError("New password must be at least 8 characters long.");
             return;
         }
-        // Добавьте другие проверки сложности пароля, если нужно
+        // Add other password complexity checks if needed
 
-        // 2. Проверка текущего пароля
+        // 2. Check current password
         if (!password_verify($currentPassword, $user->getPasswordHash())) {
             $this->flashService->addError("Incorrect current password.");
             return;
         }
 
-        // 3. Хеширование нового пароля и сохранение
+        // 3. Hash new password and save
         $newPasswordHash = password_hash($newPassword, PASSWORD_DEFAULT);
-        if ($user->updatePassword($newPasswordHash)) { // Предполагается, что есть такой метод в User.php
+        if ($user->updatePassword($newPasswordHash)) { // Assumes such a method exists in User.php
             $this->flashService->addSuccess("Your password has been changed successfully.");
 
-            // 4. Отправка уведомления на email
+            // 4. Send email notification
             $siteName = defined('SITE_NAME') ? \SITE_NAME : (defined('MAIL_FROM_NAME') ? \MAIL_FROM_NAME : 'Our Website');
             $changeDateTime = date('Y-m-d H:i:s');
-            // $userIpAddress = $_SERVER['REMOTE_ADDR'] ?? null; // Опционально, если хотите логировать/отправлять IP
+            // $userIpAddress = $_SERVER['REMOTE_ADDR'] ?? null; // Optional, if you want to log/send IP
 
-            global $mailerService; // Или лучше внедрить через конструктор
+            global $mailerService; // Or better, inject via constructor
             if (!$mailerService instanceof \App\Lib\MailerService) {
                 error_log("ProfileController: MailerService not available for sending password change notification.");
-                // Не прерываем пользователя из-за этого, но логируем
+                // Don't interrupt the user because of this, but log it
             } else {
                 $email_content_array = $mailerService->renderTemplate('password_changed_notification', [
                     'username' => $user->getUsername() ?? 'User',
                     'siteName' => $siteName,
                     'changeDateTime' => $changeDateTime,
-                    // 'changeIpAddress' => $userIpAddress, // Опционально
+                    // 'changeIpAddress' => $userIpAddress, // Optional
                 ]);
                 $emailSubject = "Password Changed Notification - " . $siteName;
 
                 if ($email_content_array && isset($email_content_array['html']) && isset($email_content_array['text'])) {
                     if (!$mailerService->send(
-                        $user->getEmail(), // Отправляем на email пользователя
+                        $user->getEmail(), // Send to user's email
                         $user->getUsername() ?? 'User',
                         $emailSubject,
                         $email_content_array['html'],
                         $email_content_array['text']
                     )) {
                         error_log("ProfileController: Failed to send password change notification to {$user->getEmail()}. MailerService error: " . ($mailerService->ErrorInfo ?? 'Unknown error'));
-                        // Можно добавить flash-сообщение пользователю, что уведомление не было отправлено, но пароль изменен.
+                        // Could add a flash message to the user that notification wasn't sent, but password was changed.
                         // $this->flashService->addWarning("Your password was changed, but we couldn't send a notification email. Please check your email settings or contact support if this persists.");
                     }
                 } else {

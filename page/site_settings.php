@@ -77,8 +77,8 @@ if (empty($csrf_token)) {
 ?>
 
 <div class="page-container site-settings-page">
-    <header class="page-header">
-        <h1><?php echo htmlspecialchars($page_title); ?></h1>
+    <header class="page-header"> <!-- Changed from div to header for semantic HTML and styling -->
+        <h1 class="page-title"><?php echo htmlspecialchars($page_title); ?></h1>
     </header>
 
     <?php if (!empty($errors)): ?>

@@ -34,7 +34,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         header('Location: /index.php?page=account_dashboard');
         exit;
     } else {
-        // Улучшенная обработка ошибок
+        // Improved error handling
         if (isset($loginResult['errors']) && !empty($loginResult['errors'])) {
             foreach ($loginResult['errors'] as $error) {
                 if (strpos($error, '<a href=') !== false) {

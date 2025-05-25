@@ -1,0 +1,42 @@
+/* Main CSS file - imports all partials */
+
+/* Base styles */
+@import "base/_variables.css";
+@import "base/_reset.css";
+@import "base/_typography.css";
+/* Assuming base/_utilities.css might exist or be added later */
+/* @import "base/_utilities.css"; */
+
+/* Layout */
+@import "layout/_header.css";
+@import "layout/_grid.css";
+@import "layout/_footer.css";
+@import "layout/_page.css"; 
+@import "layout/_navigation.css"; /* Activated */
+@import "layout/_sidebar.css"; /* Activated */
+
+
+/* Components */
+@import "components/_buttons.css";
+@import "components/_forms.css";
+@import "components/_widgets.css";
+@import "components/_messages.css";
+/* Assuming _cards.css might exist or be added later */
+/* @import "components/_cards.css"; */
+
+
+/* Pages */
+@import "pages/_auth.css";
+@import "pages/_news.css";
+@import "pages/_hero.css"; 
+@import "pages/_comments.css";
+@import "pages/_dashboard.css";
+@import "pages/_profile.css";
+@import "pages/_home.css"; 
+@import "pages/_about.css"; 
+@import "pages/_manage.css"; 
+
+
+/* Utilities */
+@import "utils/_scrollbar.css";
+@import "utils/_responsive.css";

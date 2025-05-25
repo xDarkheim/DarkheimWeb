@@ -1,0 +1,175 @@
+/* Warning Message on Auth Pages */
+.auth-warning-message {
+    max-width: 600px;
+    margin: 0 auto var(--spacing-4) auto;
+    padding: var(--spacing-3);
+    background-color: rgba(var(--color-warning-rgb, 255, 193, 7), 0.1);
+    border: 1px solid var(--color-warning, #FFC107);
+    border-left-width: 5px;
+    border-radius: var(--border-radius-md);
+    color: var(--color-text);
+    width: 100%;
+    box-sizing: border-box;
+    display: block;
+}
+
+/* General styles for messages (flash_messages) WITHIN specific page containers like .form-page-container */
+.form-page-container .messages {
+    padding: var(--spacing-3) var(--spacing-4);
+    margin-top: 0; /* Убедимся, что нет отрицательного верхнего отступа */
+    margin-bottom: var(--spacing-4); /* Отступ снизу до следующего элемента */
+    border-radius: var(--border-radius-md);
+    border-width: 1px;
+    border-style: solid;
+    font-size: var(--font-size-md);
+    display: flex; /* Для выравнивания иконки, если она будет */
+    align-items: center;
+    width: 100%; /* Занимает всю ширину родительского контейнера */
+    box-sizing: border-box; /* Чтобы padding и border не влияли на общую ширину */
+    position: relative; /* Остается в потоке, позволяет z-index, если нужно перекрыть соседние элементы в потоке */
+                      /* Если z-index не нужен, можно использовать position: static; (по умолчанию для блоков) */
+    z-index: 1;       /* Небольшой z-index на всякий случай, если есть перекрытия с соседними элементами */
+    clear: both;      /* Если есть проблемы с float у предыдущих элементов */
+}
+.form-page-container .messages p {
+    margin: 0;
+    flex-grow: 1;
+}
+
+/* Стили для разных типов внутристраничных сообщений */
+.form-page-container .messages.success {
+    background-color: #2a4d34; /* Темно-зеленый фон */
+    border-color: var(--color-success); /* Ярко-зеленая рамка */
+    color: var(--color-primary-contrast); /* Светлый текст */
+}
+
+.form-page-container .messages.errors {
+    background-color: #5a2a2a; /* Темно-красный фон */
+    border-color: var(--color-danger); /* Ярко-красная рамка */
+    color: var(--color-primary-contrast); /* Светлый текст */
+}
+
+.form-page-container .messages.info {
+    background-color: #2a3f5a; /* Темно-синий фон */
+    border-color: var(--color-info); /* Ярко-синяя рамка */
+    color: var(--color-primary-contrast); /* Светлый текст */
+}
+
+/* Сообщения об ошибках или отсутствии контента на странице новостей */
+.news-page-container > .message { /* Базовый стиль для сообщений на странице новостей */
+    padding: var(--spacing-3);
+    border-radius: var(--border-radius-md);
+    margin-top: var(--spacing-3);
+    margin-bottom: var(--spacing-4);
+    border: 1px solid var(--color-border); /* Общая граница */
+}
+
+.news-page-container > .message--info {
+    background-color: var(--color-surface-accent); /* Фон как у карточек */
+    color: var(--color-text); /* Стандартный цвет текста */
+    /* border-color: var(--color-border); уже унаследовано или можно var(--color-info) для акцента */
+}
+
+.news-page-container > .message--error {
+    background-color: var(--color-danger-dark-bg, #5a2a2a); /* Темно-красный фон, как в формах */
+    color: var(--color-primary-contrast); /* Светлый текст */
+    border-color: var(--color-danger); /* Яркая красная граница */
+}
+
+.news-page-container > .message--success {
+     background-color: var(--color-success-dark-bg, #2a4d34);
+     color: var(--color-primary-contrast);
+     border-color: var(--color-success);
+}
+
+/* ==========================================================================
+   Global Flash Messages (Всплывающие уведомления)
+   ========================================================================== */
+.flash-messages-container.global-flash-messages {
+    position: fixed; /* Или 'absolute' если привязано к конкретному контейнеру */
+    top: var(--spacing-4); /* Отступ от верха страницы */
+    left: 50%;
+    transform: translateX(-50%);
+    width: auto; /* Ширина по содержимому, но с максимальным ограничением */
+    max-width: 600px; /* Максимальная ширина для читаемости */
+    z-index: 1050; /* Выше большинства элементов, но ниже модальных окон, если они есть */
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-2); /* Промежуток между несколькими сообщениями */
+}
+
+/* Базовый стиль для каждого сообщения */
+.global-flash-messages .message {
+    padding: var(--spacing-3) var(--spacing-4);
+    border-radius: var(--border-radius-md);
+    border-width: 1px;
+    border-style: solid;
+    font-size: var(--font-size-md);
+    color: var(--color-primary-contrast); /* Белый текст по умолчанию для темных фонов */
+    box-shadow: var(--shadow-lg); /* Заметная тень */
+    display: flex;
+    align-items: center;
+    justify-content: space-between; /* Для размещения кнопки "закрыть" справа */
+    opacity: 0; /* Начальная прозрачность для анимации появления */
+    transform: translateY(-20px); /* Начальное смещение для анимации */
+    animation: flashMessageFadeIn var(--transition-duration-long) ease forwards;
+    min-width: 320px; /* Минимальная ширина */
+}
+
+/* Анимация появления */
+@keyframes flashMessageFadeIn {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.global-flash-messages .message p {
+    margin: 0;
+    flex-grow: 1;
+}
+
+/* Кнопка "Закрыть" (опционально, но рекомендуется) */
+.global-flash-messages .message .close-flash-message {
+    background: none;
+    border: none;
+    color: inherit; /* Наследует цвет текста сообщения */
+    font-size: 1.5rem; /* Размер иконки "крестик" */
+    line-height: 1;
+    padding: 0 var(--spacing-1);
+    margin-left: var(--spacing-3);
+    cursor: pointer;
+    opacity: 0.7;
+    transition: opacity var(--transition-duration) ease;
+}
+.global-flash-messages .message .close-flash-message:hover {
+    opacity: 1;
+}
+
+
+/* Стили для разных типов сообщений */
+.global-flash-messages .message--success {
+    background-color: var(--color-success); /* Зеленый фон */
+    border-color: var(--color-success); /* Можно сделать чуть темнее/светлее для контраста */
+}
+
+.global-flash-messages .message--error {
+    background-color: var(--color-danger); /* Красный фон */
+    border-color: var(--color-danger);
+}
+
+.global-flash-messages .message--warning {
+    background-color: var(--color-warning); /* Желтый/оранжевый фон */
+    border-color: var(--color-warning);
+    color: var(--color-background); /* Темный текст для лучшей читаемости на желтом */
+}
+/* Если для warning нужен темный текст, то и для кнопки закрытия тоже */
+.global-flash-messages .message--warning .close-flash-message {
+    color: var(--color-background);
+}
+
+
+.global-flash-messages .message--info {
+    background-color: var(--color-info); /* Синий фон */
+    border-color: var(--color-info);
+}

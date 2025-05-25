@@ -1,0 +1,153 @@
+/* Home Page Specific Styles */
+
+.hero-section {
+    min-width: 800px; /* Ensures minimum width for larger screens */
+    background-color: var(--color-surface-soft); /* Changed: Lighter, neutral background */
+    color: var(--color-text); /* Changed: Standard text color */
+    padding: var(--spacing-5) var(--spacing-responsive); /* Adjusted padding */
+    text-align: center;
+    border-radius: var(--border-radius-xl); /* Slightly larger radius */
+    margin-bottom: var(--spacing-5);
+    border: 1px solid var(--color-border-extralight); /* Subtle border */
+}
+
+.hero-content .hero-title {
+    font-size: var(--font-size-xxxl);
+    margin-bottom: var(--spacing-2);
+    font-weight: var(--font-weight-semibold); /* Adjusted weight */
+    color: var(--color-headings); /* Changed: Standard heading color */
+}
+
+.hero-content .hero-subtitle {
+    font-size: var(--font-size-lg);
+    margin-bottom: var(--spacing-4);
+    opacity: 0.8; /* Adjusted opacity */
+    max-width: 700px;
+    margin-left: auto;
+    margin-right: auto;
+    color: var(--color-text-muted); /* Changed: Muted text color */
+}
+
+.hero-actions .button {
+    margin: 0 var(--spacing-1);
+}
+.hero-actions .button-primary {
+    background-color: var(--color-primary); /* Standard primary button */
+    border-color: var(--color-primary);
+    color: var(--color-white);
+}
+.hero-actions .button-primary:hover {
+    background-color: var(--color-primary-dark);
+    border-color: var(--color-primary-dark);
+}
+.hero-actions .button-secondary {
+    background-color: var(--color-surface); /* Standard secondary button */
+    border-color: var(--color-border);
+    color: var(--color-primary);
+}
+.hero-actions .button-secondary:hover {
+    background-color: var(--color-surface-hover);
+    border-color: var(--color-border-dark);
+}
+
+
+.home-section {
+    padding: var(--spacing-4) 0;
+    margin-bottom: var(--spacing-4);
+}
+.home-section:last-child {
+    margin-bottom: 0;
+}
+
+.home-section .section-title {
+    font-size: var(--font-size-xxl);
+    color: var(--color-headings);
+    text-align: center;
+    margin-bottom: var(--spacing-4);
+    font-family: var(--font-secondary);
+}
+
+.posts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: var(--spacing-4);
+}
+
+.post-card {
+    background-color: var(--color-surface);
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-sm); /* Changed: More subtle shadow */
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transition: box-shadow 0.2s ease-in-out; /* Only transition shadow */
+}
+.post-card:hover {
+    /* transform: translateY(-5px); Removed transform */
+    box-shadow: var(--shadow-md); /* Slightly more pronounced shadow on hover */
+}
+
+.post-card-image-link {
+    display: block;
+}
+.post-card-image {
+    width: 100%;
+    height: 200px; /* Fixed height for images */
+    object-fit: cover; /* Crop images to fit */
+}
+
+.post-card-content {
+    padding: var(--spacing-3);
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.post-card-title {
+    font-size: var(--font-size-lg);
+    margin-bottom: var(--spacing-2);
+    font-family: var(--font-secondary);
+}
+.post-card-title a {
+    color: var(--color-headings);
+    text-decoration: none;
+}
+.post-card-title a:hover {
+    color: var(--color-primary);
+}
+
+.post-card-excerpt {
+    font-size: var(--font-size-base);
+    color: var(--color-text-muted);
+    margin-bottom: var(--spacing-3);
+    flex-grow: 1;
+    line-height: 1.6;
+}
+
+.post-card .button {
+    margin-top: auto; /* Pushes button to the bottom */
+    align-self: flex-start;
+}
+
+.call-to-action {
+    background-color: transparent; /* Changed: Transparent background */
+    padding: var(--spacing-5) var(--spacing-responsive);
+    text-align: center;
+    border-radius: var(--border-radius-lg);
+    border-top: 1px solid var(--color-border-extralight); /* Add a top border for separation */
+    margin-top: var(--spacing-5);
+}
+.call-to-action .section-title {
+    margin-bottom: var(--spacing-2);
+}
+.call-to-action p {
+    font-size: var(--font-size-md);
+    color: var(--color-text);
+    margin-bottom: var(--spacing-3);
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+}
+.cta-actions .button {
+    margin: var(--spacing-1);
+}

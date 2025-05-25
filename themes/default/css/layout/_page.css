@@ -1,0 +1,75 @@
+/* General Page Layout Styles */
+
+.page-container {
+    max-width: var(--container-max-width, 1200px);
+    margin: 0 auto;
+    padding: var(--spacing-4) var(--spacing-responsive); /* Responsive padding */
+}
+
+/* For pages that should not have the sidebar and need full width */
+.page-container-full-width {
+    max-width: 100%;
+    padding: var(--spacing-4) var(--spacing-responsive);
+}
+
+.page-header {
+    margin-bottom: var(--spacing-4);
+    padding-bottom: var(--spacing-3);
+    border-bottom: 1px solid var(--color-border-light);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap; /* Allow wrapping for smaller screens */
+    gap: var(--spacing-2);
+}
+
+.page-header .page-title, /* For h1 inside .page-header */
+.page-container > .page-title /* For h1 directly under .page-container */ {
+    font-size: var(--font-size-xxl);
+    color: var(--color-headings);
+    margin-top: 0;
+    margin-bottom: 0; /* Remove bottom margin if it's part of .page-header */
+    flex-grow: 1; /* Allow title to take available space */
+}
+
+.page-header-actions {
+    display: flex;
+    gap: var(--spacing-2);
+    align-items: center;
+}
+
+/* Generic message styling for pages, if not covered by flash messages */
+.page-container .message {
+    margin-bottom: var(--spacing-3);
+    padding: var(--spacing-3);
+    border-radius: var(--border-radius-md);
+}
+.page-container .message--error {
+    background-color: var(--color-danger-bg);
+    color: var(--color-danger-dark);
+    border: 1px solid var(--color-danger);
+}
+.page-container .message--success {
+    background-color: var(--color-success-bg);
+    color: var(--color-success-dark);
+    border: 1px solid var(--color-success);
+}
+.page-container .message--info {
+    background-color: var(--color-info-bg);
+    color: var(--color-info-dark);
+    border: 1px solid var(--color-info);
+}
+.page-container .message--warning {
+    background-color: var(--color-warning-bg);
+    color: var(--color-warning-dark);
+    border: 1px solid var(--color-warning);
+}
+
+/* Centered text utility for messages or other elements */
+.text-center {
+    text-align: center;
+}
+.full-width-message {
+    width: 100%;
+    box-sizing: border-box;
+}

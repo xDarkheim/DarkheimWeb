@@ -1,0 +1,140 @@
+/* Global resets and CSS variables */
+:root {
+    --font-primary: 'Inter', sans-serif;
+    --font-secondary: 'Poppins', sans-serif;
+
+    /* Darkheim Theme Colors */
+    --color-primary: #7f5af0; /* Mystical Purple - Accent */
+    --color-primary-dark: #6949c6; /* Darker Purple */
+    --color-primary-light: #a78bfa; /* Lighter Purple */
+    --color-primary-contrast: #ffffff; /* White text on primary */
+
+    --color-accent: var(--color-primary);
+    --color-accent-dark: var(--color-primary-dark);
+    --color-accent-light: var(--color-primary-light);
+
+    --color-background: #101218; /* Deep dark background */
+    --color-surface: #1a1d24; /* Dark surface for cards, panels */
+    --color-surface-accent: #252930; /* Slightly lighter dark for accents */
+    --color-surface-overlay: rgba(26, 29, 36, 0.85); /* For modal backgrounds or overlays */
+
+    --color-text: #c5c8c6; /* Light grey for main text */
+    --color-text-muted: #888e99; /* Medium grey for secondary text */
+    --color-headings: #e0e0e0; /* Brighter off-white for headings */
+    --color-text-on-primary: var(--color-primary-contrast);
+    --color-text-on-accent: var(--color-primary-contrast);
+    --color-text-secondary: #a0a8b3; /* Slightly more muted than main text, for less emphasis */
+
+
+    --color-border: #3a3f4b; /* Dark, subtle border */
+    --color-border-light: #4a4f5b; /* Slightly lighter border */
+    --color-border-extralight: #2a2f3b; /* Very subtle border, almost like a separator */
+    --color-border-focus: var(--color-primary);
+
+    --color-success: #4CAF50; /* Green for success - vibrant on dark */
+    --color-danger: #f44336;  /* Red for errors - vibrant on dark */
+    --color-warning: #FFC107; /* Amber/Yellowish */
+    --color-warning-dark: #FFA000;
+    --color-info: #2196F3;    /* Blue for information - vibrant on dark */
+
+    --color-success-rgb: 76, 175, 80;
+    --color-danger-rgb: 244, 67, 54;
+    --color-warning-rgb: 255, 193, 7;
+    --color-info-rgb: 33, 150, 243;
+    --color-primary-rgb: 127, 90, 240;
+    --color-background-rgb: 16, 18, 24;
+    --color-surface-rgb: 26, 29, 36;
+    --color-surface-accent-rgb: 37, 41, 48;
+    --color-primary-contrast-rgb: 255, 255, 255;
+
+
+    --color-secondary: #4b5563; /* Neutral dark grey for secondary elements */
+    --color-secondary-dark: #374151;
+    --color-secondary-light: #6b7280;
+
+    --border-radius-sm: 4px; /* Slightly sharper for graphic style */
+    --border-radius: 6px;
+    --border-radius-lg: 8px;
+    --border-radius-xl: 12px;
+    --border-radius-pill: 9999px;
+
+    --shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.15), 0 1px 3px 0 rgba(var(--color-primary-rgb), 0.05);
+    --shadow-sm: 0 2px 4px -1px rgba(0, 0, 0, 0.2), 0 4px 5px 0 rgba(var(--color-primary-rgb), 0.07), 0 1px 10px 0 rgba(var(--color-primary-rgb), 0.06);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.25), 0 6px 10px 0 rgba(var(--color-primary-rgb), 0.08), 0 2px 16px 0 rgba(var(--color-primary-rgb), 0.07);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 8px 20px 2px rgba(var(--color-primary-rgb), 0.09), 0 4px 25px 2px rgba(var(--color-primary-rgb), 0.08);
+    --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.35), 0 15px 30px 5px rgba(var(--color-primary-rgb), 0.1), 0 10px 40px 5px rgba(var(--color-primary-rgb), 0.09);
+    --shadow-inner: inset 0 2px 4px 0 rgba(0,0,0,0.1);
+    --shadow-outline: 0 0 0 3px rgba(var(--color-primary-rgb), 0.4);
+
+    --spacing-0: 0.125rem; /* 2px - New smaller spacing */
+    --spacing-1: 0.25rem; /* 4px */
+    --spacing-2: 0.5rem;  /* 8px */
+    --spacing-3: 1rem;    /* 16px */
+    --spacing-4: 1.5rem;  /* 24px */
+    --spacing-5: 2rem;    /* 32px */
+    --spacing-6: 3rem;    /* 48px */
+
+    --hover-opacity: 0.85;
+    --transition-duration: 0.2s; /* Slightly faster for a snappier feel */
+    --transition-duration-long: 0.4s;
+    --transition-timing-function: ease-in-out;
+
+    /* Font sizes */
+    --font-size-xs: 0.75rem;    /* 12px */
+    --font-size-sm: 0.875rem;   /* 14px */
+    --font-size-md: 1rem;       /* 16px (base) */
+    --font-size-lg: 1.125rem;   /* 18px */
+    --font-size-xl: 1.25rem;    /* 20px */
+    --font-size-xxl: 1.5rem;   /* 24px */
+    --font-size-xxxl: 2rem;    /* 32px */
+
+
+    /* Font weights */
+    --font-weight-light: 300;
+    --font-weight-normal: 400;
+    --font-weight-medium: 500;
+    --font-weight-semibold: 600;
+    --font-weight-bold: 700;
+    --font-weight-extrabold: 800;
+
+    /* Input specific variables (can be overridden by form styles) */
+    --input-padding-y: var(--spacing-2);
+    --input-padding-x: var(--spacing-2);
+    --input-font-size: 0.95rem;
+    --input-font-weight: 400;
+    --input-line-height: 1.5;
+    --input-color: var(--color-text);
+    --input-bg: var(--color-surface-accent);
+    --input-border-color: var(--color-border);
+    --input-border-radius: var(--border-radius-sm);
+    --input-focus-color: var(--color-text);
+    --input-focus-bg: var(--color-surface-accent);
+    --input-focus-border-color: var(--color-border-focus);
+    --input-placeholder-color: var(--color-text-muted);
+
+    /* Button specific variables */
+    --button-padding-y: var(--spacing-2);
+    --button-padding-x: var(--spacing-3);
+    --button-padding-y-sm: var(--spacing-1);
+    --button-padding-x-sm: var(--spacing-2);
+    --button-padding-y-lg: var(--spacing-3);
+    --button-padding-x-lg: var(--spacing-4);
+    --button-font-size: 0.95rem;
+    --button-font-weight: 600;
+    --button-line-height: 1.5;
+    --button-border-radius: var(--border-radius-sm);
+    --button-text: var(--color-primary-contrast); /* Default button text color */
+
+    /* Other theme specific variables */
+    --color-primary-ultralight: rgba(var(--color-primary-rgb), 0.05); /* Very light primary for backgrounds */
+    --color-primary-lighter: rgba(var(--color-primary-rgb), 0.15); /* Lighter primary for subtle highlights */
+    --color-surface-header: var(--color-surface); /* Table header, etc. */
+    --color-headings-table: var(--color-headings);
+    --color-surface-zebra: rgba(var(--color-surface-accent-rgb), 0.3); /* For striped tables */
+    --color-surface-hover: rgba(var(--color-primary-rgb), 0.075);
+    --color-surface-disabled: var(--color-secondary-dark);
+    --color-text-disabled: var(--color-text-muted);
+    --color-border-disabled: var(--color-secondary-dark);
+    --color-surface-code: var(--color-background); /* Background for code blocks */
+    --color-text-main: var(--color-text); /* Alias for main text color */
+}

@@ -108,9 +108,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 ?>
 
-<div class="page-container create-article-page"> <!-- Ensured page-container for consistency -->
+<div class="page-container create-article-page">
     <a href="/index.php?page=manage_articles" class="button button-secondary form-page-back-link">&laquo; Back to Manage Articles</a>
-    <h1 class="page-title"><?php echo htmlspecialchars($page_title); ?></h1>
+    <h1><?php echo htmlspecialchars($page_title); ?></h1>
 
     <?php if (!empty($page_messages)): ?>
         <?php foreach ($page_messages as $message): ?>

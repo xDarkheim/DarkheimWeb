@@ -1,0 +1,105 @@
+/* Adaptation for mobile devices */
+@media (max-width: 992px) { /* Or another breakpoint, e.g., 768px */
+    .auth-layout-split {
+        flex-direction: column; /* Columns one under another */
+        align-items: center; /* Center content if columns become narrow */
+    }
+    .auth-layout-column-form,
+    .auth-layout-column-info {
+        flex-basis: auto; /* Reset basis */
+        width: 100%; /* Columns take up full width */
+        max-width: 600px; /* Limit maximum width for readability */
+    }
+    .auth-layout-column-info {
+        order: -1; /* Info column (title and warning) will be on top */
+        text-align: center; /* Center text in info column on mobile */
+        padding-top: 0;
+        margin-bottom: var(--spacing-4);
+    }
+    .auth-layout-column-info .page-title,
+    .auth-layout-column-info .auth-page-main-title {
+        text-align: center;
+    }
+    .auth-layout-column-info .auth-warning-message {
+        margin-left: auto;
+        margin-right: auto; /* Center the warning block */
+    }
+    .auth-form-card {
+        margin: 0 auto; /* Center the form card if narrower than the column */
+    }
+}
+
+/* Responsive adjustments for smaller screens */
+@media (max-width: 992px) { /* Tablet and below */
+    .site-wrapper {
+        flex-direction: column;
+        margin-top: var(--spacing-3);
+        gap: var(--spacing-3);
+    }
+    .sidebar {
+        width: 100%; /* Full width on smaller screens */
+        margin-bottom: var(--spacing-3);
+    }
+}
+
+@media (max-width: 768px) { /* Mobile */
+    .header-container {
+        position: relative; /* For mobile nav positioning */
+    }
+    .main-navigation {
+        display: none; /* Hide desktop nav */
+        position: absolute;
+        top: 100%; /* Position below header */
+        left: 0;
+        right: 0;
+        background-color: var(--color-surface);
+        flex-direction: column;
+        padding: var(--spacing-3);
+        box-shadow: var(--shadow-md);
+        border-top: 1px solid var(--color-border);
+    }
+    .main-navigation.active { /* Class toggled by JS */
+        display: flex;
+    }
+    .main-navigation ul {
+        flex-direction: column;
+        gap: var(--spacing-1);
+    }
+    .main-navigation a {
+        display: block; /* Make links full width */
+        padding: var(--spacing-2);
+    }
+    .mobile-nav-toggle {
+        display: block; /* Show hamburger icon */
+    }
+
+    .site-wrapper {
+        margin-top: var(--spacing-2);
+        padding: 0 var(--spacing-2);
+        gap: var(--spacing-2);
+    }
+    .main-content, .sidebar {
+        padding: var(--spacing-3);
+    }
+    .footer-content {
+        flex-direction: column;
+    }
+    .footer-nav {
+        flex-direction: column;
+        gap: var(--spacing-1);
+    }
+
+    /* Flash messages responsiveness */
+    .flash-messages-container.global-flash-messages {
+        top: var(--spacing-2);
+        left: var(--spacing-2);
+        right: var(--spacing-2);
+        width: auto; /* Занимает доступную ширину с отступами */
+        max-width: none;
+        transform: translateX(0);
+    }
+    .global-flash-messages .message {
+        font-size: var(--font-size-sm);
+        padding: var(--spacing-2) var(--spacing-3);
+    }
+}
