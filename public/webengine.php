@@ -23,7 +23,7 @@ $site_settings_from_db = $settingsManager->getAllSettings();
 
 $flashMessageService = new FlashMessageService();
 
-$mailerService = new MailerService($site_settings_from_db); 
+$mailerService = new MailerService($site_settings_from_db);
 
 $auth = new Auth($database_handler, $flashMessageService, $mailerService);
 
@@ -35,23 +35,23 @@ $page_key = isset($_GET['page']) ? trim(strtolower($_GET['page'])) : 'home';
 
 $router->dispatch($page_key);
 
-$all_messages = $flashMessageService->getMessages(); // Получаем все сообщения ОДИН РАЗ и очищаем из сессии
+$all_messages = $flashMessageService->getMessages(); // Get all messages ONCE and clear them from the session
 
-$page_messages_for_display = []; // Сообщения для основного отображения
-$sidebar_success_text = null;    // Текст для сообщения в боковой панели
+$page_messages_for_display = []; // Messages for main display
+$sidebar_success_text = null;    // Text for the message in the sidebar
 
 $sidebar_success_identifier = $_SESSION['success_message_sidebar'] ?? null;
 if ($sidebar_success_identifier) {
-    unset($_SESSION['success_message_sidebar']); // Очищаем идентификатор из сессии
+    unset($_SESSION['success_message_sidebar']); // Clear the identifier from the session
 }
 
-// Обрабатываем сообщения типа 'success' для возможного разделения
+// Process 'success' type messages for possible separation
 if (isset($all_messages['success']) && is_array($all_messages['success'])) {
     $main_success_messages = [];
     if ($sidebar_success_identifier) {
         foreach ($all_messages['success'] as $msgData) {
             if (isset($msgData['text']) && $msgData['text'] === $sidebar_success_identifier) {
-                $sidebar_success_text = $msgData['text']; // Или $msgData, если нужен флаг is_html
+                $sidebar_success_text = $msgData['text']; // Or $msgData, if is_html flag is needed
             } else {
                 $main_success_messages[] = $msgData;
             }
@@ -72,20 +72,20 @@ foreach ($all_messages as $type => $messagesOfType) {
     }
 }
 
-global $template_data; 
+global $template_data;
 if (!isset($template_data) || !is_array($template_data)) {
-    $template_data = []; 
+    $template_data = [];
 }
 $template_data['page_messages'] = $page_messages_for_display;
 if ($sidebar_success_text) {
-    $template_data['sidebar_success_message_text'] = $sidebar_success_text; // Для использования в компоненте боковой панели
+    $template_data['sidebar_success_message_text'] = $sidebar_success_text; // For use in the sidebar component
 }
 
 $current_user_role = $_SESSION['user_role'] ?? null;
 
 $site_name_from_db = $site_settings_from_db['site_name'] ?? 'WebEngine Darkheim';
 
-$current_page_specific_title = $page_title ?? 'Default Title'; 
+$current_page_specific_title = $page_title ?? 'Default Title';
 
 if ($current_page_specific_title && $current_page_specific_title !== $site_name_from_db) {
     $title_for_html_tag = htmlspecialchars($current_page_specific_title) . " | " . htmlspecialchars($site_name_from_db);
@@ -95,16 +95,16 @@ if ($current_page_specific_title && $current_page_specific_title !== $site_name_
     $main_heading_for_page = htmlspecialchars($site_name_from_db);
 }
 
-$template_data['html_page_title'] = $title_for_html_tag; 
-$template_data['page_main_heading'] = $main_heading_for_page; 
-$template_data['site_name_logo'] = htmlspecialchars($site_name_from_db); 
+$template_data['html_page_title'] = $title_for_html_tag;
+$template_data['page_main_heading'] = $main_heading_for_page;
+$template_data['site_name_logo'] = htmlspecialchars($site_name_from_db);
 
 $template_data['site_config'] = $site_settings_from_db;
 
 $template_data['database_handler'] = $database_handler;
 $template_data['db'] = $db;
 
-$navigationComponent = new NavigationComponent($page_key); 
+$navigationComponent = new NavigationComponent($page_key);
 $template_data['main_navigation_html'] = $navigationComponent->render();
 
 $auth_pages_no_sidebar = ['login', 'register', 'edit_user', 'forgot_password' , 'resend_verification', 'error_404', 'reset_password'];
@@ -133,24 +133,24 @@ extract($template_data);
 
 require_once ROOT_PATH . DS . 'themes' . DS . SITE_THEME . DS . 'header.php';
 
-// Отображение flash-сообщений для основного контента ПЕРЕД основным контентом страницы
-if (!empty($page_messages) && is_array($page_messages)) { // Используем $page_messages из extract($template_data)
-    // Убираем встроенный style отсюда, он будет в CSS
-    echo '<div class="flash-messages-container global-flash-messages">'; 
+// Display flash messages for the main content BEFORE the main page content
+if (!empty($page_messages) && is_array($page_messages)) { // Use $page_messages from extract($template_data)
+    // Remove inline style from here, it will be in CSS
+    echo '<div class="flash-messages-container global-flash-messages">';
     foreach ($page_messages as $type => $messagesOfType) {
         if (is_array($messagesOfType)) {
             foreach ($messagesOfType as $messageData) {
                 if (is_array($messageData) && isset($messageData['text'])) {
                     $text = $messageData['is_html'] ?? false ? $messageData['text'] : htmlspecialchars($messageData['text']);
-                    
-                    // Используем классы из вашей темы
-                    $baseMessageClass = 'message'; // Базовый класс из вашего style.css
+
+                    // Use classes from your theme
+                    $baseMessageClass = 'message'; // Base class from your style.css
                     $typeMessageClass = '';
                     switch (htmlspecialchars($type)) {
                         case 'success':
                             $typeMessageClass = 'message--success';
                             break;
-                        case 'error': // Убедитесь, что FlashMessageService использует 'error'
+                        case 'error': // Ensure FlashMessageService uses 'error'
                             $typeMessageClass = 'message--error';
                             break;
                         case 'warning':
@@ -160,15 +160,15 @@ if (!empty($page_messages) && is_array($page_messages)) { // Используе�
                             $typeMessageClass = 'message--info';
                             break;
                         default:
-                            // Можно задать класс по умолчанию или оставить пустым,
-                            // если базового .message достаточно
-                            $typeMessageClass = 'message--info'; 
+                            // Can set a default class or leave empty
+                            // if the base .message is sufficient
+                            $typeMessageClass = 'message--info';
                     }
                     $alertClass = trim("$baseMessageClass $typeMessageClass");
 
                     echo "<div class=\"{$alertClass}\" role=\"alert\">";
-                    // <p> уже имеет margin-bottom: 0; из вашего класса .message p:last-child
-                    echo "<p>{$text}</p>"; 
+                    // <p> already has margin-bottom: 0; from your .message p:last-child class
+                    echo "<p>{$text}</p>";
                     echo "</div>";
                 }
             }
@@ -182,9 +182,9 @@ if (!empty($content_file) && file_exists($content_file)) {
     require_once $content_file;
 } else {
     error_log("Error: Content file not found or invalid for page key '{$page_key}'. Expected at: {$content_file}");
-    // Убедимся, что $page_title установлен для страницы 404
-    $page_title = "Page Not Found"; 
-    // Пересчитаем заголовок для HTML, если он изменился
+    // Ensure $page_title is set for the 404 page
+    $page_title = "Page Not Found";
+    // Recalculate the HTML title if it changed
     if ($page_title && $page_title !== ($site_settings_from_db['site_name'] ?? 'WebEngine Darkheim')) {
         $template_data['html_page_title'] = htmlspecialchars($page_title) . " | " . htmlspecialchars($site_settings_from_db['site_name'] ?? 'WebEngine Darkheim');
         $template_data['page_main_heading'] = htmlspecialchars($page_title);
@@ -192,8 +192,8 @@ if (!empty($content_file) && file_exists($content_file)) {
         $template_data['html_page_title'] = htmlspecialchars($site_settings_from_db['site_name'] ?? 'WebEngine Darkheim');
         $template_data['page_main_heading'] = htmlspecialchars($site_settings_from_db['site_name'] ?? 'WebEngine Darkheim');
     }
-    // Обновим переменные после extract, если они используются напрямую в header.php до этого момента
-    // Это может быть не нужно, если header.php использует только $template_data
+    // Update variables after extract, if they are used directly in header.php before this point
+    // This might not be necessary if header.php only uses $template_data
     $html_page_title = $template_data['html_page_title'];
     $page_main_heading = $template_data['page_main_heading'];
 

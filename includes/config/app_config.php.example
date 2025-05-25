@@ -9,11 +9,11 @@ define('DB_PASS', 'your_db_password');
 define('DB_CHARSET', 'utf8mb4');
 
 // Site Configuration
-define('SITE_URL', 'http://yourdomain.com'); // Измените на URL вашего сайта
-define('SITE_THEME', 'default'); // Тема по умолчанию
-// ... другие нечувствительные настройки ...
+define('SITE_URL', 'http://yourdomain.com'); // Change to your site URL
+define('SITE_THEME', 'default'); // Default theme
+// ... other non-sensitive settings ...
 
-// Email Configuration (пример, если используется)
+// Email Configuration (example, if used)
 define('MAIL_HOST', 'smtp.example.com');
 define('MAIL_PORT', 587);
 define('MAIL_USERNAME', 'your_email_username');
@@ -22,5 +22,5 @@ define('MAIL_ENCRYPTION', 'tls'); // 'tls' or 'ssl'
 define('MAIL_FROM_ADDRESS', 'noreply@example.com');
 define('MAIL_FROM_NAME', 'Your Site Name');
 
-// ... другие настройки ...
+// ... other settings ...
 ?>

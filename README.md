@@ -9,7 +9,8 @@ WebEngine Darkheim is a web application focused on providing a resource hub for 
 
 ## Features
 
-*   **User Authentication**: Secure user registration ([page/register.php](page/register.php)), login ([page/login.php](page/login.php)), and logout ([modules/logout_process.php](modules/logout_process.php)) functionality.
+*   **User Authentication**: Secure user registration ([page/register.php](page/register.php)), login ([page/login.php](page/login.php)), logout ([modules/logout_process.php](modules/logout_process.php)), password reset, and email verification.
+    *   Styled HTML email templates for registration verification ([includes/view/emails/registration_verification.php](includes/view/emails/registration_verification.php)) and password reset requests ([includes/view/emails/password_reset_request.php](includes/view/emails/password_reset_request.php)).
 *   **Account Management**:
     *   User dashboard ([page/account/dashboard.php](page/account/dashboard.php)).
     *   Profile updates ([page/account/edit_profile.php](page/account/edit_profile.php)).
@@ -29,6 +30,7 @@ WebEngine Darkheim is a web application focused on providing a resource hub for 
     *   Reusable UI elements in [includes/components/](includes/components/).
 *   **Theming**: Support for themes, with a default theme located in [themes/default/](themes/default/).
 *   **Basic Pages**: Includes standard pages like About ([page/about.php](page/about.php)), Contact ([page/contact.php](page/contact.php)), and a 404 error page ([page/404.php](page/404.php)).
+*   **Flash Messages**: System for displaying temporary user notifications.
 
 ## Project Structure
 
@@ -37,11 +39,12 @@ WebEngine Darkheim is a web application focused on providing a resource hub for 
 ├── includes/           # Core files, libraries, and components
 │   ├── bootstrap.php   # Main application bootstrap
 │   ├── components/     # Reusable UI components (NavigationComponent, QuickLinksComponent, UserPanelComponent)
-│   ├── config/         # Configuration files (app_config.php, routes.php, router_config.php, etc.)
+│   ├── config/         # Configuration files (app_config.php.example, routes.php, router_config.php, etc.)
 │   ├── controllers/    # Business logic handlers (ProfileController, etc.)
-│   ├── lib/            # Utility libraries (Database, Router, FlashMessageService, etc.)
+│   ├── lib/            # Utility libraries (Auth, Database, Router, FlashMessageService, MailerService, etc.)
 │   ├── models/         # Database interaction models (Article, User, Category, Comment)
-│   └── view/           # View partials (e.g., _sidebar_user_panel.php)
+│   └── view/           # View partials and email templates
+│       └── emails/     # HTML and text email templates
 ├── modules/            # Action processing scripts (login_process.php, add_comment_process.php, etc.)
 ├── page/               # User-facing pages
 │   ├── account/        # User account-specific pages (dashboard, profiles, articles, settings, admin user management)
@@ -53,14 +56,18 @@ WebEngine Darkheim is a web application focused on providing a resource hub for 
 │   ├── news.php
 │   ├── site_settings.php # Admin page for site settings
 │   └── register.php
-├── public/             # Publicly accessible files
+├── public/             # Publicly accessible files (DOCUMENT_ROOT)
 │   ├── index.php       # Main entry point of the application (via webengine.php)
 │   └── webengine.php   # Core request handler
 ├── themes/             # Site themes
 │   └── default/        # Default theme (CSS, potentially JS, images)
 │       └── css/
 │           └── style.css
+├── vendor/             # Composer dependencies (e.g., PHPMailer) - Should be installed via Composer
 ├── .htaccess           # Apache server configuration
+├── .gitignore          # Specifies intentionally untracked files that Git should ignore
+├── composer.json       # Defines project dependencies for Composer
+├── composer.lock       # Records exact versions of dependencies
 └── README.md           # This file
 ```
 *(Note: `public/assets/` directory can be used for globally shared assets like images or JavaScript libraries not specific to a theme.)*
@@ -70,29 +77,41 @@ WebEngine Darkheim is a web application focused on providing a resource hub for 
 *   PHP 7.4 or higher (PHP 8.x recommended)
 *   Web Server (Apache with `mod_rewrite` enabled, or Nginx with equivalent configuration)
 *   MySQL or MariaDB
+*   Composer for managing PHP dependencies
 *   Git for cloning the repository
 
-## Setup
+## Setup and Deployment
 
 1.  **Clone the repository.**
     ```bash
     git clone https://github.com/xDarkheim/lab # Replace with your actual repository URL
     cd lab
     ```
-2.  **Web Server Configuration**: Configure your web server (e.g., Apache, Nginx) to point the document root to the `public/` directory of the project.
+2.  **Install Dependencies**: Use Composer to install required PHP libraries (like PHPMailer).
+    ```bash
+    composer install --no-dev --optimize-autoloader
+    ```
+    *   `--no-dev`: Skips development-specific dependencies.
+    *   `--optimize-autoloader`: Optimizes the autoloader for production.
+
+3.  **Web Server Configuration**:
+    *   Configure your web server (e.g., Apache, Nginx) to point the **document root** to the `public/` directory of the project. This is crucial for security.
     *   Ensure `mod_rewrite` is enabled for Apache if using the provided `.htaccess`.
-3.  **Database Setup**:
-    *   Create a database (e.g., `simple` as suggested in `app_config.php`).
-    *   Update database connection details in `includes/config/app_config.php`:
-        ```php
-        // filepath: includes/config/app_config.php
-        define('DB_HOST', 'your_db_host'); // e.g., 'localhost'
-        define('DB_NAME', 'your_db_name'); // e.g., 'simple'
-        define('DB_USER', 'your_db_user');
-        define('DB_PASS', 'your_db_password');
-        define('DB_CHARSET', 'utf8mb4');
+
+4.  **Configuration File**:
+    *   Copy the example configuration file:
+        ```bash
+        cp includes/config/app_config.php.example includes/config/app_config.php
         ```
-    *   **Database Schema**: Execute the following SQL queries to create the necessary tables. Alternatively, consider creating a `database_schema.sql` file in the repository and importing it.
+    *   Edit `includes/config/app_config.php` and update the following:
+        *   Database connection details (`DB_HOST`, `DB_NAME`, `DB_USER`, `DB_PASS`).
+        *   `SITE_URL` to match your domain.
+        *   Email sending configuration (e.g., `MAIL_HOST`, `MAIL_USERNAME`, `MAIL_PASSWORD`, etc.) if you are using SMTP for sending emails.
+    *   **Important**: The actual `includes/config/app_config.php` file (with your credentials) is ignored by Git (see `.gitignore`) and should **never** be committed to the repository.
+
+5.  **Database Setup**:
+    *   Create a database (e.g., `simple` or your chosen name in `app_config.php`).
+    *   **Database Schema**: Execute the following SQL queries to create the necessary tables. You can also find this schema in the `README.md` or create a `database_schema.sql` file.
 
     ```sql
     CREATE TABLE `users` (
@@ -101,6 +120,9 @@ WebEngine Darkheim is a web application focused on providing a resource hub for 
       `email` varchar(255) NOT NULL,
       `password_hash` varchar(255) NOT NULL,
       `role` varchar(50) DEFAULT 'user', -- e.g., 'user', 'editor', 'admin'
+      `is_active` tinyint(1) NOT NULL DEFAULT 0,
+      `email_verification_token_hash` VARCHAR(255) NULL DEFAULT NULL,
+      `email_verification_expires_at` DATETIME NULL DEFAULT NULL,
       `reset_token_hash` VARCHAR(255) NULL DEFAULT NULL,
       `reset_token_expires_at` DATETIME NULL DEFAULT NULL,
       `location` varchar(255) DEFAULT NULL,
@@ -120,7 +142,7 @@ WebEngine Darkheim is a web application focused on providing a resource hub for 
       `title` varchar(255) NOT NULL,
       `short_description` text DEFAULT NULL,
       `full_text` longtext NOT NULL,
-      `date` datetime NOT NULL, -- Consider renaming to published_at or similar if it's for publication date
+      `date` datetime NOT NULL, 
       `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
       `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
       PRIMARY KEY (`id`),
@@ -148,17 +170,17 @@ WebEngine Darkheim is a web application focused on providing a resource hub for 
     CREATE TABLE `comments` (
       `id` int(11) NOT NULL AUTO_INCREMENT,
       `article_id` int(11) NOT NULL,
-      `user_id` int(11) DEFAULT NULL, -- Allow anonymous comments if user_id is NULL
-      `author_name` VARCHAR(255) DEFAULT NULL, -- For anonymous comments if user_id is NULL
+      `user_id` int(11) DEFAULT NULL, 
+      `author_name` VARCHAR(255) DEFAULT NULL, 
       `content` text NOT NULL,
-      `status` VARCHAR(50) NOT NULL DEFAULT 'pending', -- e.g., 'pending', 'approved', 'rejected'
+      `status` VARCHAR(50) NOT NULL DEFAULT 'pending', 
       `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
       `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
       PRIMARY KEY (`id`),
       KEY `article_id` (`article_id`),
       KEY `user_id` (`user_id`),
       CONSTRAINT `comments_ibfk_1` FOREIGN KEY (`article_id`) REFERENCES `articles` (`id`) ON DELETE CASCADE,
-      CONSTRAINT `comments_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE SET NULL -- Or CASCADE if users must exist
+      CONSTRAINT `comments_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE SET NULL 
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
     CREATE TABLE IF NOT EXISTS `site_settings` (
@@ -176,16 +198,17 @@ WebEngine Darkheim is a web application focused on providing a resource hub for 
     ('admin_email', 'admin@example.com');
     ```
 
-4.  **Permissions**: Ensure the web server has appropriate write permissions for any directories that require it (e.g., if you plan to have file uploads or a server-side cache).
-5.  **Dependencies**: If there are PHP dependencies managed by Composer (currently no `composer.json` is listed), run `composer install`.
-6.  **Access**: Open the application in your browser, pointing to your `public/` directory (e.g., `http://localhost/lab/public/` or your configured virtual host like `http://darkheim.lab/`).
+6.  **Permissions**: Ensure the web server has appropriate write permissions for any directories that require it (e.g., if you plan to have file uploads, a server-side cache, or log directories).
+
+7.  **Access**: Open the application in your browser, pointing to your `public/` directory (e.g., `http://localhost/lab/public/` or your configured virtual host like `http://darkheim.lab/`).
 
 ## Usage
 
 *   **Browse Content**: Navigate to pages like Home (`/`), News (`/index.php?page=news`), About (`/index.php?page=about`), and Contact (`/index.php?page=contact`).
 *   **User Accounts**:
-    *   Register for a new account via `/index.php?page=register`.
+    *   Register for a new account via `/index.php?page=register`. You will receive a verification email.
     *   Login to an existing account via `/index.php?page=login`.
+    *   If you forget your password, use the "Forgot Password" link on the login page.
     *   Access your dashboard at `/index.php?page=account_dashboard` after logging in.
     *   Manage your profile, articles (if applicable by role), and settings through the account pages.
 *   **Admin Functions**: Users with the 'admin' role can access:
@@ -197,6 +220,7 @@ WebEngine Darkheim is a web application focused on providing a resource hub for 
 *   **Theming**:
     *   Modify the existing theme in [themes/default/css/style.css](themes/default/css/style.css).
     *   Create a new theme by duplicating the `default` theme directory and updating `SITE_THEME` in `includes/config/app_config.php`.
+*   **Email Templates**: Customize HTML email templates in [includes/view/emails/](includes/view/emails/).
 *   **Modules**: Add new functionality by creating new PHP scripts in the [modules/](modules/) directory for processing data or actions.
 *   **Pages**: Create new content pages within the [page/](page/) directory. Define their routes and access rules in `includes/config/routes.php` and `includes/config/router_config.php`.
 *   **Components**: Develop new reusable UI parts in [includes/components/](includes/components/) and integrate them into your pages.

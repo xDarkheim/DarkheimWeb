@@ -72,7 +72,6 @@ class Auth {
             $siteName = defined('SITE_NAME') ? \SITE_NAME : (defined('MAIL_FROM_NAME') ? \MAIL_FROM_NAME : 'Our Website');
             $verificationLink = rtrim(SITE_URL, '/') . "/index.php?page=verify_email&token=" . urlencode($verificationToken);
             
-            // Переименуем переменную для ясности
             $email_content_array = $this->mailerService->renderTemplate('registration_verification', [
                 'username' => $username,
                 'verificationLink' => $verificationLink,
@@ -80,9 +79,7 @@ class Auth {
             ]);
             $emailSubject = "Verify Your Email Address - " . $siteName;
 
-            // Проверяем, что получили массив и нужные ключи
             if ($email_content_array && isset($email_content_array['html']) && isset($email_content_array['text'])) {
-                // Передаем HTML и текст как отдельные аргументы
                 if ($this->mailerService->send($email, $username, $emailSubject, $email_content_array['html'], $email_content_array['text'])) {
                     return ['success' => true, 'message' => "Registration successful! Please check your email (" . htmlspecialchars($email) . ") to verify your account and activate it."];
                 } else {
@@ -157,7 +154,6 @@ class Auth {
             $siteName = defined('SITE_NAME') ? \SITE_NAME : (defined('MAIL_FROM_NAME') ? \MAIL_FROM_NAME : 'Our Website');
             $verificationLink = rtrim(SITE_URL, '/') . "/index.php?page=verify_email&token=" . urlencode($verificationToken);
             
-            // Получаем массив с HTML и текстовой версией
             $email_content_array = $this->mailerService->renderTemplate('registration_verification', [
                 'username' => $user->getUsername() ?? 'User',
                 'verificationLink' => $verificationLink,
@@ -165,15 +161,13 @@ class Auth {
             ]);
             $emailSubject = "Verify Your Email Address - " . $siteName;
 
-            // Проверяем, что рендеринг прошел успешно и у нас есть обе части письма
             if ($email_content_array && isset($email_content_array['html']) && isset($email_content_array['text'])) {
-                // Передаем HTML и текст как отдельные аргументы
                 if ($this->mailerService->send(
                     $user->getEmail() ?? '', 
                     $user->getUsername() ?? 'User', 
                     $emailSubject, 
-                    $email_content_array['html'],  // HTML часть
-                    $email_content_array['text']   // Текстовая часть
+                    $email_content_array['html'],
+                    $email_content_array['text']
                 )) {
                     return ['success' => true, 'message' => "A new verification email has been sent to " . htmlspecialchars($user->getEmail() ?? '') . ". Please check your inbox."];
                 } else {
@@ -181,7 +175,6 @@ class Auth {
                     return ['success' => false, 'message' => "Could not send verification email. Please try again later or contact support."];
                 }
             } else {
-                // Ошибка рендеринга шаблона
                 error_log("Auth::resendVerificationEmail - Failed to render email template 'registration_verification' for user {$user->getEmail()}.");
                 return ['success' => false, 'message' => "Could not prepare the verification email. Please contact support."];
             }
